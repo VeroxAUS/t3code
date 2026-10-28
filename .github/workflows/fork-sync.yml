@@ -1,0 +1,191 @@
+# Keeps this fork on the latest upstream T3 Code release.
+#
+# Daily: if pingdotgg/t3code has a newer stable release than .fork/BASE_TAG, rebuild the usage
+# strip on top of it, build the Windows installer, and prepare a DRAFT release. Publishing the
+# draft (one click) is what makes the installed app auto-update.
+# Manual: choose an upstream tag, and whether to publish (false = build only, installer kept
+# as a workflow artifact, nothing moves).
+#
+# Needs the repo secret FORK_PUSH_TOKEN: a fine-grained token for this repo only with
+# Contents (read/write) and Workflows (read/write). Pushes that touch workflow files cannot
+# use the built-in token.
+name: Fork sync
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      target_tag:
+        description: "Upstream tag to build (empty = latest stable release)"
+        type: string
+        default: ""
+      publish:
+        description: "Create the draft release and move fork-main (false = build only)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fork-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Prepare candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: write
+    outputs:
+      skip: ${{ steps.sync.outputs.skip }}
+      tag: ${{ steps.sync.outputs.tag }}
+      version: ${{ steps.sync.outputs.version }}
+      candidate_sha: ${{ steps.sync.outputs.candidate_sha }}
+      patch_sha: ${{ steps.sync.outputs.patch_sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.FORK_PUSH_TOKEN }}
+          fetch-depth: 1
+
+      - name: Build candidate branch
+        id: sync
+        env:
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          TARGET_TAG: ${{ inputs.target_tag }}
+        run: bash .fork/sync.sh
+
+      # Best effort: GitHub pauses scheduled workflows after 60 days without repo activity.
+      - name: Keep the schedule alive
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/fork-sync.yml/enable" || true
+
+  build:
+    name: Build Windows installer
+    needs: sync
+    if: needs.sync.outputs.skip == 'false'
+    runs-on: windows-2025
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refs/heads/candidate/${{ needs.sync.outputs.version }}
+          persist-credentials: false
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: package.json
+          cache: false
+          run-install: false
+
+      - name: Install
+        run: vp install
+
+      - name: Type check web
+        run: vp run --filter @t3tools/web typecheck
+
+      - name: Build installer
+        env:
+          T3CODE_DESKTOP_UPDATE_REPOSITORY: ${{ github.repository }}
+        run: >
+          vp run dist:desktop:win:x64
+          --output-dir "$RUNNER_TEMP/out"
+          --build-version "${{ needs.sync.outputs.version }}"
+          --verbose
+
+      - name: Check the usage strip is in the packaged web app
+        run: grep -rlq 'data-usage-strip' apps/web/dist
+
+      - name: Check the update feed points at this fork
+        run: |
+          grep -q "version: ${{ needs.sync.outputs.version }}" "$RUNNER_TEMP/out/latest.yml"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ needs.sync.outputs.version }}
+          path: |
+            ${{ runner.temp }}/out/T3-Code-*.exe
+            ${{ runner.temp }}/out/T3-Code-*.exe.blockmap
+            ${{ runner.temp }}/out/latest.yml
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Draft release and move fork-main
+    needs: [sync, build]
+    if: >
+      needs.sync.outputs.skip == 'false' &&
+      (github.event_name == 'schedule' || inputs.publish)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.FORK_PUSH_TOKEN }}
+          fetch-depth: 1
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: installer-${{ needs.sync.outputs.version }}
+          path: out
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.sync.outputs.version }}
+          TAG: ${{ needs.sync.outputs.tag }}
+          CAND_SHA: ${{ needs.sync.outputs.candidate_sha }}
+        run: |
+          git fetch --depth=1 origin "refs/heads/candidate/$VERSION"
+          gh release create "v$VERSION" out/* \
+            --draft --target "$CAND_SHA" \
+            --title "$VERSION (unofficial fork build)" \
+            --notes "Unofficial, unsigned build of T3 Code $TAG with a persistent usage strip above the composer. Not affiliated with or endorsed by T3 Tools. Windows x64 only; no WSL runtime. Built by the Fork sync workflow from the usage-strip branch."
+
+      - name: Move fork-main and usage-strip to the candidate
+        env:
+          CAND_SHA: ${{ needs.sync.outputs.candidate_sha }}
+          PATCH_SHA: ${{ needs.sync.outputs.patch_sha }}
+        run: git push --force origin "$CAND_SHA:refs/heads/fork-main" "$PATCH_SHA:refs/heads/usage-strip"
+
+  report-failure:
+    name: Open or update a failure issue
+    needs: [sync, build, publish]
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Report
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SYNC: ${{ needs.sync.result }}
+          BUILD: ${{ needs.build.result }}
+          PUBLISH: ${{ needs.publish.result }}
+        run: |
+          gh label create fork-sync-failed --repo "$GITHUB_REPOSITORY" --color B60205 \
+            --description "Automatic fork sync failed" 2>/dev/null || true
+          url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          body="The Fork sync run failed. prepare: $SYNC, build: $BUILD, publish: $PUBLISH. Log: $url"
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label fork-sync-failed --state open \
+            --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --label fork-sync-failed \
+              --title "Fork sync failed" --body "$body"
+          fi
