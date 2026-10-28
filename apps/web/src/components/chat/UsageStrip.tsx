@@ -1,4 +1,4 @@
-import { useAtomValue } from "@effect/atom-react";
+﻿import { useAtomValue } from "@effect/atom-react";
 import type { EnvironmentId } from "@t3tools/contracts";
 import {
   collectLimitAccounts,
@@ -14,6 +14,7 @@ import { providerClients } from "../settings/providerDriverMeta";
 import { barColor } from "../usage/UsageLimits";
 
 const SHORT_LABEL = { session: "Session", weekly: "Week" } as const;
+const LOW_REMAINING_PERCENT = 20;
 
 function StripWindow({
   window,
@@ -25,16 +26,28 @@ function StripWindow({
   readonly now: number;
 }) {
   const nextReset = Math.min(...window.resets.map((reset) => reset.at));
+  const low = window.remainingPercent <= LOW_REMAINING_PERCENT;
   return (
     <span className="flex items-center gap-1.5">
       {SHORT_LABEL[window.kind as keyof typeof SHORT_LABEL]}
       <span className="h-1.5 w-9 overflow-hidden rounded-full bg-muted">
         <span
           className="block h-full rounded-full"
-          style={{ width: `${window.remainingPercent}%`, backgroundColor: color }}
+          style={{
+            width: `${window.remainingPercent}%`,
+            backgroundColor: low ? "var(--warning)" : color,
+          }}
         />
       </span>
-      <span className="font-medium text-foreground tabular-nums">{window.remainingPercent}%</span>
+      {/* Both providers show quota left, so every number falls as you use more. */}
+      <span className={low ? "text-warning" : undefined}>
+        <span
+          className={low ? "font-medium tabular-nums" : "font-medium text-foreground tabular-nums"}
+        >
+          {window.remainingPercent}%
+        </span>{" "}
+        left
+      </span>
       {Number.isFinite(nextReset) ? <span>{formatDuration(nextReset - now)}</span> : null}
     </span>
   );
