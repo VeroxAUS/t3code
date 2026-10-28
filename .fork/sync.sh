@@ -35,10 +35,11 @@ out skip false
 git config user.name "VeroxAUS"
 git config user.email "$NOREPLY"
 git remote get-url upstream >/dev/null 2>&1 || git remote add upstream "https://github.com/$UPSTREAM.git"
-git fetch -q --no-tags --depth=1 upstream \
-  "refs/tags/$target:refs/tags/up-target" "refs/tags/$base_tag:refs/tags/up-base"
-git fetch -q --no-tags --depth=20 origin \
-  "$PATCH_BRANCH:refs/remotes/origin/$PATCH_BRANCH" "fork-main:refs/remotes/origin/fork-main"
+# Forced (+) so a repeated run in the same clone can retarget the tags.
+git fetch --no-tags --depth=1 upstream \
+  "+refs/tags/$target:refs/tags/up-target" "+refs/tags/$base_tag:refs/tags/up-base"
+git fetch --no-tags --depth=20 origin \
+  "+$PATCH_BRANCH:refs/remotes/origin/$PATCH_BRANCH" "+fork-main:refs/remotes/origin/fork-main"
 
 mapfile -t commits < <(git rev-list --reverse "origin/$PATCH_BRANCH" ^up-base)
 [ "${#commits[@]}" -gt 0 ] || { echo "::error::no feature commits between $base_tag and $PATCH_BRANCH"; exit 1; }
