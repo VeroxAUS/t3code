@@ -38,6 +38,8 @@ If the file's `status` or kind does not match what your prompt accepts, stop and
 - Every settings field has a decoding default.
 - Never touch `~/.t3/userdata`. Kill only PIDs you captured at spawn. Start a dev server with `setsid vp run dev > /tmp/dev.log 2>&1 &` and stop it with `kill -- -<that PID>`, so the server and web children die with it.
 - **Manifest.** `DOCS/CHANGES.md` lists every upstream file the overlay has changed, one line each: path, reason, and whether it carries a `// overlay:` marker. Any file outside the overlay-owned paths is upstream. Add a `// overlay: <reason>` comment on changed lines where the file type allows comments; JSON, YAML without comments and lockfiles get a manifest line only. `scripts/overlay-check.ts` fails a PR whose changed upstream paths and manifest disagree in either direction. Overlay-owned paths: `packages/routing`, `apps/server/src/routing`, `apps/web/src/components/team`, `evals/routing`, `scripts/overlay-check.ts`, `.github/workflows/overlay-*.yml`, `DOCS`.
+- Tests run through the repo-local binary from the package directory: `cd <package> && <repo>/node_modules/.bin/vp test run <files>`. The global `vp` on PATH breaks every `@effect/vitest` file with `Cannot read properties of undefined (reading 'config')`. `vp run check:changed` from the repo root is fine.
+- **Developer actions.** Never change repository settings (branch protection, required checks, Actions settings, secrets) and never dispatch a workflow or publish a release; the permission layer denies these and they belong to the developer. List each under `## Developer actions` in your handoff: the exact command, when to run it (most need this PR merged first), and what to record. Then finish the rest of the step. Pushing your branch and opening or closing PRs are yours.
 - Scope is the prompt. Something adjacent looks wrong: write it under "Open questions", do not fix it.
 - A file or symbol a prompt or doc names is missing: grep for the symbol or the nearest name, use the real path, record the correction under Gotchas, and continue. Stop only when nothing matches.
 
@@ -57,7 +59,7 @@ supersedes: <the handoff named in your launch line, or none>
 status: <passed | findings, review links only>
 ```
 
-Write every path in the handoff with `DOCS` already resolved (for example `docs/multi-agent-harness/prompts/...`), so the Next line can be pasted as is. Then where we are, done with the proving command and its one-line result (mutations such as a workflow dispatch or a PR creation carry their URL as evidence instead), not done, decisions, gotchas, open questions, and one `Next` line of the form:
+Write every path in the handoff with `DOCS` already resolved (for example `docs/multi-agent-harness/prompts/...`), so the Next line can be pasted as is. Then where we are, done with the proving command and its one-line result (mutations such as a workflow dispatch or a PR creation carry their URL as evidence instead), not done, decisions, gotchas, developer actions, open questions, and one `Next` line of the form:
 
 ```
 Next: Run DOCS/prompts/<file> [for phase N] with handoff DOCS/handoffs/<this file> — on <model and effort named in that prompt>

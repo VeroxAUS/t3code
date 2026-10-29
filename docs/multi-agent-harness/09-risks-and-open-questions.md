@@ -35,6 +35,8 @@
 9. A Phase 0b of four contract spikes (token semantics, replay durability, permissions map, candidate workspaces) runs before Phase 1 (2026-10-29).
 10. `overlay/main` is based on the upstream `v0.1.3` tag and the sync merges upstream release tags, not nightly `main` (2026-10-29).
 11. `fork-main` and `usage-strip` are archived, untouched; the usage strip and the Windows installer workflow are ported in Phase 0 steps 7 and 8; the old `fork-sync.yml` goes inert when `overlay/main` becomes the default branch (2026-10-29).
+12. Single machine only, no cloud VM: an always-on 32 GB VM costs about A$250/month after Hetzner's June 2026 price rise. Scheduled automations and night shifts run only while the PC is awake, so Phase 6 designs for missed and late runs (2026-10-29).
+13. Upstream's `ci.yml` and `mobile-fingerprint-check.yml` are disabled on the fork: they need upstream's Blacksmith runners and queue forever. PR CI is `overlay-check` (Phase 0 step 6) plus each thread's local `vp run check:changed`. Repository settings and workflow dispatches are developer actions, never agent actions (2026-10-29).
 
 ## Original questions
 

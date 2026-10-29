@@ -51,7 +51,7 @@ Not a reason: raw speed for the default fleet size.
 
 This is what T3's remote model is for and needs no new code.
 
-1. Provision a Linux VM, 8 vCPU / 32 GB. Approximate prices, unverified today: Hetzner CCX33 or CPX51 about €55–65/month; DigitalOcean 8 vCPU / 32 GB about $170/month; AWS c7a.2xlarge about $0.30/hour on demand, less on spot.
+1. Provision a Linux VM, 8 vCPU / 32 GB. Prices checked 2026-10-29, excluding tax: Hetzner CCX33 (Germany) €138.49/month after its 15 June 2026 increase (was €62.49); Hetzner's cheaper CX53 and CAX41 (€29.49 and €40.99) have not been orderable since September 2026; DigitalOcean General Purpose 8 vCPU / 32 GB about US$252/month, or US$192 for the shared-CPU Basic plan; AWS c7a.2xlarge about US$0.41/hour on demand in us-east-1, more in Sydney, so only worth it part-time or on spot.
 2. Install Node 26, git, pnpm; run `npx t3` headless as a systemd service (docs/user/background-service.md and docs/user/remote-access.md).
 3. Tailscale on both machines; no public ports. T3 Connect is the alternative when Tailscale is not possible.
 4. Log in `claude` and `codex` on the VM with the same accounts (same windows, no extra quota) or a second account (extra quota).

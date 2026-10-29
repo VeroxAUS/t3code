@@ -7,6 +7,7 @@ import {
   type DesktopUpdateCheckResult,
   type DesktopUpdateState,
 } from "@t3tools/contracts";
+import { OVERLAY_BUILD } from "@t3tools/shared/overlayBuild"; // overlay: updater default
 import { errorTag } from "@t3tools/shared/observability";
 import * as Cause from "effect/Cause";
 import * as Context from "effect/Context";
@@ -312,6 +313,7 @@ function getAutoUpdateDisabledReason(args: {
   appImage?: string | undefined;
   isDebPackage: boolean;
   disabledByEnv: boolean;
+  disabledByOverlay: boolean; // overlay: updates are managed by the overlay unless re-enabled by env
   hasUpdateFeedConfig: boolean;
 }): string | null {
   if (!args.hasUpdateFeedConfig) {
@@ -319,6 +321,9 @@ function getAutoUpdateDisabledReason(args: {
   }
   if (args.isDevelopment || !args.isPackaged) {
     return "Automatic updates are only available in packaged production builds.";
+  }
+  if (args.disabledByOverlay) {
+    return "Updates are managed by the overlay; set T3CODE_DISABLE_AUTO_UPDATE=false to use the upstream feed."; // overlay
   }
   if (args.disabledByEnv) {
     return "Automatic updates are disabled by the T3CODE_DISABLE_AUTO_UPDATE setting.";
@@ -420,7 +425,8 @@ export const make = Effect.gen(function* () {
         platform: environment.platform,
         appImage: Option.getOrUndefined(config.appImagePath),
         isDebPackage,
-        disabledByEnv: config.disableAutoUpdate,
+        disabledByEnv: Option.getOrElse(config.disableAutoUpdate, () => false),
+        disabledByOverlay: OVERLAY_BUILD && Option.isNone(config.disableAutoUpdate), // overlay
         hasUpdateFeedConfig: hasFeedConfig,
       }),
     );
