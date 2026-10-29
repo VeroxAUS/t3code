@@ -1,14 +1,15 @@
 # Handoff · Phase 0 · Fix 2 · 2026-10-29 · written by Codex
 
-commit: 622ece0fafbf2e3a4f7a322b25d17253d1e3f4f3
+commit: c51861c950
 supersedes: docs/overlay/handoffs/phase-0-review-2.md
 
 ## Where we are
 
-Branch `overlay/phase-0-fix-2` · worktree `/home/verox/src/t3code-phase-0` · handoff-only follow-up. The commit above is the reviewed baseline; this handoff introduces no implementation change. Phase completion remains the reviewer's decision.
+Branch `overlay/phase-0-fix-2` · worktree `/home/verox/src/t3code-phase-0` · handoff-only follow-up. The commit above contains the fix disposition; this handoff introduces no implementation change. Phase completion remains the reviewer's decision.
 
 ## Done, verified
 
+- PR: https://github.com/VeroxAUS/t3code/pull/14 into `overlay/main`; opened, not merged.
 - Finding 1 (scheduled-sync evidence) — disputed as a blocking finding under the developer's recorded decision; the missing evidence remains open. Proof: `gh run list --repo VeroxAUS/t3code --workflow overlay-sync.yml --json databaseId,event,conclusion,createdAt,url` at 2026-10-29 07:21 UTC returned only successful `workflow_dispatch` run 40822950375, created 2026-10-29T05:21:44Z: https://github.com/VeroxAUS/t3code/actions/runs/40822950375. This does not prove scheduled execution.
 - `gh api repos/VeroxAUS/t3code/actions/workflows/overlay-sync.yml --jq '{state,path}'` → `state: active`, path `.github/workflows/overlay-sync.yml`. No workflow or repository setting was changed and no workflow was dispatched.
 - `vp run check:changed origin/overlay/main` → pass (format; code checks skipped for this handoff-only change). The sandbox denied a Git subprocess; the escalated rerun passed. No runtime logic changed, so no logic test applies.
