@@ -1,6 +1,6 @@
 // @effect-diagnostics nodeBuiltinImport:off globalConsole:off
 // Reconciles a PR's changed upstream paths with the overlay manifest, requires
-// a handoff when upstream paths change, and runs the routing tests.
+// a handoff when files outside docs/overlay change, and runs the routing tests.
 //
 //   node scripts/overlay-check.ts --base origin/overlay/main
 //
@@ -90,8 +90,9 @@ export const missingMarkers = (
       return text !== undefined && !MARKER.test(text);
     });
 
+// Any change outside docs/overlay needs a handoff, overlay-owned code included: one PR per step.
 export const handoffRuleBroken = (diffPaths: ReadonlyArray<string>) =>
-  diffPaths.some((path) => !isOverlayOwned(path)) &&
+  diffPaths.some((path) => !path.startsWith("docs/overlay/")) &&
   !diffPaths.some((path) => path.startsWith(HANDOFF_DIR));
 
 // quotePath=false keeps non-ASCII paths as real paths instead of quoted escapes.
@@ -182,7 +183,9 @@ const run = () => {
     }
 
     if (handoffRuleBroken(diffPaths)) {
-      fail(`This diff changes upstream paths but adds or changes no file under ${HANDOFF_DIR}.`);
+      fail(
+        `This diff changes files outside docs/overlay but adds or changes none under ${HANDOFF_DIR}.`,
+      );
     }
   }
 

@@ -71,16 +71,17 @@ it("warns only for commentable files whose marker is missing", () => {
   );
 });
 
-it("requires a handoff only when upstream paths change", () => {
+it("requires a handoff when anything outside docs/overlay changes", () => {
   assert.isTrue(handoffRuleBroken(["apps/server/src/a.ts"]));
+  assert.isTrue(handoffRuleBroken(["packages/routing/src/index.ts"]));
   assert.isTrue(handoffRuleBroken(["apps/server/src/a.ts", "docs/overlay/CHANGES.md"]));
+  assert.isFalse(handoffRuleBroken(["docs/overlay/CHANGES.md"]));
   assert.isFalse(
     handoffRuleBroken(["apps/server/src/a.ts", "docs/overlay/handoffs/phase-0-step-6.md"]),
   );
   assert.isFalse(
     handoffRuleBroken(["apps/server/src/a.ts", "docs/overlay/handoffs/sync-v1.0.0.md"]),
   );
-  assert.isFalse(handoffRuleBroken(["packages/routing/src/index.ts"]));
 });
 
 it("ignores paths a sync merge brought in unchanged from the upstream tag", () => {
