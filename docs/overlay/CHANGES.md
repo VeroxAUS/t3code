@@ -28,3 +28,5 @@ Every upstream file the overlay has changed, one line each: path, reason, and wh
 - `packages/shared/src/projectSettings.test.ts` — nested overlay override keeps the other keys. Marker: yes
 - `apps/server/src/server.ts` — `AnalyticsService.layer` is provided the settings layer. Marker: yes
 - `knip.jsonc` — `scripts.entry` lists `overlay-check.ts`, which only the overlay workflows run. Marker: yes
+- `apps/web/src/components/chat/UsageStrip.tsx` — new composer usage strip ported from the `usage-strip` branch; whole file is overlay code, header comment is the marker. Marker: yes
+- `apps/web/src/components/chat/ChatComposer.tsx` — renders `UsageStrip` above the composer banner dock. Marker: yes
