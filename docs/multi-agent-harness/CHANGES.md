@@ -18,3 +18,5 @@ Every upstream file the overlay has changed, one line each: path, reason, and wh
 - `apps/server/src/cloud/selfUpdate.test.ts` — harness points at a fork feed by default; test for the guard. Marker: yes
 - `apps/server/src/telemetry/AnalyticsService.ts` — `T3CODE_TELEMETRY_ENABLED` defaults to false in overlay builds. Marker: yes
 - `apps/server/src/telemetry/AnalyticsService.test.ts` — test that no event is sent under the overlay default. Marker: yes
+- `package.json` — `knip:check` lists `--workspace packages/routing`. Marker: no (JSON)
+- `pnpm-lock.yaml` — lockfile entry for the new `@t3tools/routing` workspace. Marker: no (lockfile)
