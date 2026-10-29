@@ -36,7 +36,9 @@ branch `overlay/phase-0-step-7` · worktree `/home/verox/src/t3code-phase-0` · 
 ## Open questions for the developer
 
 - OK to run one dev pass (`setsid vp run dev`, `Replay (dev)` provider, one browser screenshot) to confirm the strip renders? I did not do it without your say-so.
+  Answer: Yes, run the dev pass. Add the screenshot path or log line under Done in the handoff, commit, push, then stop.
 - For the Phase 1 design round (`03-cost-ledger-and-pressure.md`): the strip computes remaining % (`window.remainingPercent`), the low-quota threshold (`LOW_REMAINING_PERCENT = 20`) and time to next reset itself, from `@t3tools/shared/usageLimits`. The pressure signal will own remaining %, pace and thresholds; left as is, not refactored. It also reads only the primary environment's config.
+  Answer: Agreed, leave it. Phase 1 decides whether the strip reads the pressure signal instead of computing its own; one source of truth is the goal. Primary environment only is fine: single machine, decision 12.
 
 ## Next
 
