@@ -40,6 +40,24 @@ describe("DesktopUpdates", () => {
     }),
   );
 
+  // overlay: updates are off unless T3CODE_DISABLE_AUTO_UPDATE=false
+  it.effect("stays disabled and skips update checks under the overlay default", () => {
+    const harness = makeHarness({ env: { T3CODE_DISABLE_AUTO_UPDATE: undefined } });
+
+    return Effect.scoped(
+      Effect.gen(function* () {
+        const updates = yield* DesktopUpdates.DesktopUpdates;
+        yield* updates.configure;
+
+        const checked = yield* updates.check("manual");
+        assert.equal(checked.checked, false);
+        assert.equal(checked.state.status, "disabled");
+        assert.match(checked.state.message ?? "", /managed by the overlay/);
+        assert.equal(harness.checkCount(), 0);
+      }),
+    ).pipe(Effect.provide(harness.layer));
+  });
+
   it.effect("keeps the disabled reason available after configuration and channel changes", () => {
     const harness = makeHarness({ env: { T3CODE_DISABLE_AUTO_UPDATE: "true" } });
     const reason = "Automatic updates are disabled by the T3CODE_DISABLE_AUTO_UPDATE setting.";

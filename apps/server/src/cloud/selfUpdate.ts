@@ -24,6 +24,7 @@ import * as Stream from "effect/Stream";
 import { HttpClient } from "effect/http";
 
 import { CLI_RELEASE_BASE_URL_ENV } from "@t3tools/shared/cliRelease";
+import { OVERLAY_BUILD } from "@t3tools/shared/overlayBuild"; // overlay: self-update guard
 
 import packageJson from "../../package.json" with { type: "json" };
 import * as ServerConfig from "../config.ts";
@@ -242,6 +243,13 @@ export const make = Effect.fn("cloud.server_self_update.make")(function* () {
     if (capability === null) {
       return yield* failWith(
         "Remote updates require the T3 Code background service. Run `t3 service install` on the server machine.",
+      );
+    }
+
+    // overlay: the default release feed is upstream's and would replace this server with it
+    if (OVERLAY_BUILD && releaseBaseUrl === undefined) {
+      return yield* failWith(
+        `Updates are managed by the overlay; set ${CLI_RELEASE_BASE_URL_ENV} to a fork release feed to enable server updates.`,
       );
     }
 
