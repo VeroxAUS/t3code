@@ -18,7 +18,7 @@ Read `_preamble.md`. Gate: the step-5 handoff exists.
    - run `vp test run packages/routing`.
      Unit-test the first two behaviours with small fixtures. `scripts/` is the workspace `@t3tools/scripts`; add `scripts/overlay-check.ts` to the `scripts.entry` list in `knip.jsonc` (precedent: `setup-worktree.ts`) or knip goes red.
 2. `.github/workflows/overlay-check.yml` on `pull_request` targeting `overlay/main`, running the script with `--base origin/overlay/main`. Call the same script from `overlay-sync.yml` after its merge step with `--base origin/overlay/main` too; the sync handoff satisfies the handoff rule and upstream's own files are not overlay changes, so the manifest check must ignore paths the merge brought in unchanged relative to upstream (compare against the upstream merge base, not only the PR base).
-3. Now that the check reports, make `overlay-check` a required status check on `overlay/main` (`gh api`, or list the setting for the developer under Open questions). The sync PRs from step 1 satisfy it because the PAT triggers `pull_request` workflows and they carry a sync handoff; confirm that in the handoff.
+3. Making `overlay-check` a required status check on `overlay/main` is a developer action. Write the exact `gh api -X PUT repos/VeroxAUS/t3code/branches/overlay%2Fmain/protection` command with the check's real context name, and keep the existing settings in the same body (pull request required with 0 approvals, `enforce_admins: true`, no force pushes, no deletions), because the PUT replaces them all. The sync PRs from step 1 satisfy the check because the PAT triggers `pull_request` workflows and they carry a sync handoff; confirm that in the handoff.
 
 ## Accept
 

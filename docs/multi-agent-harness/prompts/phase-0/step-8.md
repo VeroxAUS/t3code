@@ -20,7 +20,7 @@ On the archived branch: `git show origin/fork-main:.fork/sync.sh` and `git show 
 
 ## Accept
 
-A manual dispatch of `overlay-release.yml` produces a draft release with an installer artifact (record the URL); `vp run check:changed` passes.
+`vp run check:changed` passes. The dispatch of `overlay-release.yml` is a developer action after this PR merges (`gh workflow run overlay-release.yml --ref overlay/main`); the developer records the draft release URL in the complete handoff before the review starts, and the review checks it.
 
 ## Handoff
 

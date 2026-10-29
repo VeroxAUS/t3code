@@ -41,8 +41,11 @@ branch `overlay/phase-0-step-2` · worktree `/home/verox/src/t3code-phase-0` · 
 ## Open questions for the developer
 
 - Allow `gh workflow run overlay-sync.yml --ref overlay/main` (the call was denied)? Or run it yourself and paste the run URL; step 3 can record it.
+  Answer: Developer ran it: https://github.com/VeroxAUS/t3code/actions/runs/40822950375"
 - Which release feed should overlay desktop and server updates use later (fork GitHub releases via `app-update.yml` / `T3CODE_RELEASE_BASE_URL`)? Until decided, both are off.
+  Answer: Later. Both stay off until the step-8 release workflow exists.
 - `T3CODE_DISABLE_AUTO_UPDATE=false` on an overlay build re-enables updates from whatever feed `app-update.yml` names, which is upstream's. Intended as an escape hatch for now; should it be removed once a fork feed exists?
+  Answer: Keep it for now. Revisit with the release feed.
 
 ## Next
 

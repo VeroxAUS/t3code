@@ -364,7 +364,7 @@ cd ~/src/t3code-phase-0
 cat docs/multi-agent-harness/handoffs/phase-0-step-0.md    # docs/overlay/handoffs/... from step 5 onward
 ```
 
-Read it. Answer any "Open questions" by editing that file inline and committing on the thread's branch (`git add -A && git commit -m "handoff: answers" && git push`). Merge the PR once its checks are green:
+Read it. Run anything under "Developer actions" once its PR has merged, and write each result (usually a URL) under that action; the next thread commits it with its work. Answer any "Open questions" by editing that file inline and committing on the thread's branch (`git add -A && git commit -m "handoff: answers" && git push`). Merge the PR once its checks are green:
 
 ```bash
 gh repo set-default VeroxAUS/t3code   # once; without it gh may target upstream
