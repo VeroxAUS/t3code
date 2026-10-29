@@ -11,6 +11,7 @@ supersedes: docs/overlay/handoffs/phase-0-fix.md
 
 ## Done, verified
 
+- Review PR: https://github.com/VeroxAUS/t3code/pull/13 into `overlay/main`.
 - Re-read the Phase 0 roadmap, every Phase 0 handoff, fork decision, architecture, execution plan, manifest and applicable final-review briefs. Inspected PR 12's diff and the cumulative implementation diff from v0.1.3; the prior review records the original PR-diff review. No implementation changes made.
 - Prior finding 1 cleared: `gh run view 40833226635 --repo VeroxAUS/t3code --json conclusion,event,url,jobs` reports success for checkout, Windows installer build and draft release. Run: https://github.com/VeroxAUS/t3code/actions/runs/40833226635. `gh api repos/VeroxAUS/t3code/releases` confirms draft `overlay-v0.1.3-overlay.1` with `T3-Code-0.1.3-overlay.1-x64.exe`, its `.blockmap`, and `latest.yml`: https://github.com/VeroxAUS/t3code/releases/tag/untagged-5ecdc6ba2719b0a3a79a. No dispatch or release mutation repeated.
 - Prior finding 2 cleared: inspected `/mnt/c/Users/Thomas/status.png` (the handoff's `C:\Users\Thomas\status.png`). It visibly shows Codex and Claude session/weekly remaining quota and reset countdowns above the composer. The developer records `Replay (dev)` as the exercised provider and explicitly owns the manual render pass. This is developer-supplied evidence; no browser or computer use was performed by this review.
