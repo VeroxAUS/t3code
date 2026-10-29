@@ -4,7 +4,9 @@ Every upstream file the overlay has changed, one line each: path, reason, and wh
 
 ## Test command
 
-`vp run check:changed` plus `vp test run <files you touched>`, run from the package directory with the repo-local binary (`<repo>/node_modules/.bin/vp`); see the step-2 handoff gotchas.
+- `vp run check:changed` before every push.
+- `vp test run <files you touched>` while iterating, run from the package directory with the repo-local binary (`<repo>/node_modules/.bin/vp`); see the step-2 handoff gotchas.
+- Never a repo-wide check.
 
 ## Changed upstream files
 
@@ -20,8 +22,8 @@ Every upstream file the overlay has changed, one line each: path, reason, and wh
 - `apps/server/src/telemetry/AnalyticsService.test.ts` — tests for the opt-in default, opt-in, and the env override. Marker: yes
 - `package.json` — `knip:check` lists `--workspace packages/routing`. Marker: no (JSON)
 - `pnpm-lock.yaml` — lockfile entry for the new `@t3tools/routing` workspace. Marker: no (lockfile)
-- `packages/contracts/src/settings.ts` — `overlay` key on `ServerSettings`, `ServerSettingsPatch`, `PROJECT_SCOPED_SERVER_SETTING_KEYS` and `ProjectSettingsOverrides`. Marker: yes
-- `packages/contracts/src/settings.test.ts` — overlay decoding defaults and patch round-trip. Marker: yes
+- `packages/contracts/src/settings.ts` — `overlay` key on `ServerSettings`, `ServerSettingsPatch`, `PROJECT_SCOPED_SERVER_SETTING_KEYS` and `ProjectSettingsOverrides`; project overrides accept only `routing`, `budgets` and `cockpit`. Marker: yes
+- `packages/contracts/src/settings.test.ts` — overlay decoding defaults, patch round-trip, and project override drops `telemetry` and `limits`. Marker: yes
 - `packages/shared/src/projectSettings.ts` — `resolveProjectSettings` deep-merges `overlay` instead of replacing it. Marker: yes
 - `packages/shared/src/projectSettings.test.ts` — nested overlay override keeps the other keys. Marker: yes
 - `apps/server/src/server.ts` — `AnalyticsService.layer` is provided the settings layer. Marker: yes

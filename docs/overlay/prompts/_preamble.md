@@ -8,7 +8,7 @@ One thread in a chain building the multi-agent overlay on this T3 Code fork (`Ve
 
 ## Paths
 
-`DOCS` means `docs/overlay/` if that folder exists, otherwise `docs/multi-agent-harness/`. Phase 0 step 5 moves it.
+`DOCS` means `docs/overlay/`.
 
 ## Gate
 
@@ -59,7 +59,7 @@ supersedes: <the handoff named in your launch line, or none>
 status: <passed | findings, review links only>
 ```
 
-Write every path in the handoff with `DOCS` already resolved (for example `docs/multi-agent-harness/prompts/...`), so the Next line can be pasted as is. Then where we are, done with the proving command and its one-line result (mutations such as a workflow dispatch or a PR creation carry their URL as evidence instead), not done, decisions, gotchas, developer actions, open questions, and one `Next` line of the form:
+Write every path in the handoff with `DOCS` already resolved (for example `docs/overlay/prompts/...`), so the Next line can be pasted as is. Then where we are, done with the proving command and its one-line result (mutations such as a workflow dispatch or a PR creation carry their URL as evidence instead), not done, decisions, gotchas, developer actions, open questions, and one `Next` line of the form:
 
 ```
 Next: Run DOCS/prompts/<file> [for phase N] with handoff DOCS/handoffs/<this file> — on <model and effort named in that prompt>

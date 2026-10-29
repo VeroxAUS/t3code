@@ -74,6 +74,24 @@ describe("overlay settings", () => {
       decodeServerSettingsPatch({ overlay: { budgets: { onExceed: "ignore" } } }),
     ).toThrow();
   });
+
+  it("drops machine-wide groups from a project override", () => {
+    const projectId = ProjectId.make("project-1");
+    const settings = decodeServerSettings({
+      projectSettingsOverrides: {
+        [projectId]: {
+          overlay: {
+            budgets: { perChildUsd: 2 },
+            telemetry: { optIn: true },
+            limits: { maxConcurrentChildren: 99 },
+          },
+        },
+      },
+    });
+    expect(settings.projectSettingsOverrides[projectId]?.overlay).toEqual({
+      budgets: { perChildUsd: 2 },
+    });
+  });
 });
 
 describe("storage cleanup settings", () => {

@@ -44,6 +44,7 @@ branch `overlay/phase-0-step-4` · worktree `/home/verox/src/t3code-phase-0` · 
 ## Open questions for the developer
 
 - `overlay` is project-scoped as a whole, as specified, so a project can override `overlay.telemetry.optIn` and `overlay.limits.maxConcurrentChildren`, which are machine-wide. Analytics reads the global value, so a project-level `telemetry.optIn` is accepted and ignored. Should step 5+ narrow the project override schema to `routing`, `budgets` and `cockpit`?
+  Answer: Yes, narrow it in this step's PR. Project overrides for `overlay` accept only `routing`, `budgets` and `cockpit`; `telemetry` and `limits` are global only. Keep the deep merge for the three project keys. Add one test row proving a project override cannot change `telemetry.optIn` or `limits.maxConcurrentChildren`. Record it under Decisions.
 
 ## Next
 

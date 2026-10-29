@@ -1043,6 +1043,14 @@ export const OverlaySettingsPatch = Schema.Struct({
 });
 export type OverlaySettingsPatch = typeof OverlaySettingsPatch.Type;
 
+/** Telemetry and limits are machine-wide, so a project override cannot name them. */
+export const OverlayProjectOverride = Schema.Struct({
+  routing: OverlaySettingsPatch.fields.routing,
+  budgets: OverlaySettingsPatch.fields.budgets,
+  cockpit: OverlaySettingsPatch.fields.cockpit,
+});
+export type OverlayProjectOverride = typeof OverlayProjectOverride.Type;
+
 export const PROJECT_SCOPED_SERVER_SETTING_KEYS = [
   "worktreeCleanup",
   "defaultModelSelection",
@@ -1108,7 +1116,7 @@ export const ProjectSettingsOverrides = Schema.Struct({
   sidebarAutoSettleKeepPullRequests: Schema.optionalKey(Schema.Boolean),
   continueThreadsAfterServerUpdate: Schema.optionalKey(Schema.Boolean),
   responseStreamingMode: Schema.optionalKey(ResponseStreamingMode),
-  overlay: Schema.optionalKey(OverlaySettingsPatch), // overlay: merged per field by resolveProjectSettings
+  overlay: Schema.optionalKey(OverlayProjectOverride), // overlay: merged per field by resolveProjectSettings
   providerInstances: Schema.optionalKey(
     Schema.Record(ProviderInstanceId, ProjectProviderInstanceOverride),
   ),
