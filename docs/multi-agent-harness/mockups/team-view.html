@@ -1,0 +1,367 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Team view mockup</title>
+    <style>
+      :root {
+        --bg: var(--background, #0f1115);
+        --fg: var(--foreground, #e6e8ee);
+        --muted: var(--muted-foreground, #8b93a7);
+        --o-card: var(--card, #171a21);
+        --o-border: var(--border, #262b36);
+        --o-primary: var(--primary, #7c9cff);
+        --ok: var(--success, #3ddc97);
+        --warn: var(--warning, #f5b942);
+        --bad: var(--destructive, #ff6b6b);
+        --c1: var(--chart-1, #2dd4bf);
+        --c2: var(--chart-2, #60a5fa);
+        --c3: var(--chart-3, #a78bfa);
+        --c4: var(--chart-4, #f59e0b);
+        --r: var(--radius, 10px);
+        --mono: var(--font-mono, ui-monospace, Menlo, monospace);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--bg);
+        font: 13px/1.45 var(--font-sans, system-ui, sans-serif);
+        color: var(--fg);
+        max-width: 760px;
+      }
+      .rail {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .g {
+        background: var(--o-card);
+        border: 1px solid var(--o-border);
+        border-radius: var(--r);
+        padding: 10px 12px;
+      }
+      .g h4 {
+        margin: 0 0 6px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      .bar {
+        height: 6px;
+        background: var(--o-border);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 5px;
+        font-family: var(--mono);
+      }
+      .lane {
+        border: 1px solid var(--o-border);
+        border-radius: var(--r);
+        background: var(--o-card);
+        margin-bottom: 12px;
+        overflow: hidden;
+      }
+      .lane > header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--o-border);
+        font-weight: 600;
+        font-size: 12px;
+      }
+      .lane > header .m {
+        color: var(--muted);
+        font-weight: 400;
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .inbox {
+        padding: 6px 12px;
+      }
+      .inbox div {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px dashed var(--o-border);
+      }
+      .inbox div:last-child {
+        border: 0;
+      }
+      .btn {
+        border: 1px solid var(--o-border);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 11px;
+        color: var(--fg);
+        background: transparent;
+      }
+      .btn.p {
+        border-color: var(--o-primary);
+        color: var(--o-primary);
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 10px 12px;
+      }
+      .card {
+        position: relative;
+        border: 1px solid var(--o-border);
+        border-radius: 8px;
+        padding: 9px 10px 12px;
+        background: color-mix(in srgb, var(--o-card) 70%, var(--bg));
+      }
+      .card.need {
+        border-left: 3px solid var(--o-primary);
+      }
+      .card.stall {
+        box-shadow: 0 0 0 1px var(--warn) inset;
+      }
+      .card .t {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+      .role {
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .pill {
+        font-size: 10px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        border: 1px solid;
+        font-family: var(--mono);
+      }
+      .cheap {
+        color: var(--c1);
+        border-color: var(--c1);
+      }
+      .std {
+        color: var(--c2);
+        border-color: var(--c2);
+      }
+      .fr {
+        color: var(--c3);
+        border-color: var(--c3);
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 11px;
+        font-family: var(--mono);
+      }
+      .st {
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .bb {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: var(--o-border);
+        border-radius: 0 0 8px 8px;
+      }
+      .bb i {
+        display: block;
+        height: 100%;
+      }
+      .why {
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--muted);
+        border-top: 1px dashed var(--o-border);
+        padding-top: 5px;
+      }
+      .tick {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--o-border);
+      }
+      .tick b {
+        font-size: 12px;
+      }
+      .tick .m {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .mq {
+        display: flex;
+        gap: 8px;
+        padding: 8px 12px;
+        flex-wrap: wrap;
+      }
+      .mq span {
+        border: 1px solid var(--o-border);
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-family: var(--mono);
+      }
+      .kb {
+        color: var(--muted);
+        font-size: 11px;
+        font-family: var(--mono);
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="rail">
+      <div class="g">
+        <h4>
+          <span><i class="dot" style="background: var(--warn)"></i>Claude Max</span
+          ><span class="meta">amber</span>
+        </h4>
+        <div class="bar"><i style="width: 71%; background: var(--warn)"></i></div>
+        <div class="sub">weekly 71% · on pace · resets Fri 09:00</div>
+      </div>
+      <div class="g">
+        <h4>
+          <span><i class="dot" style="background: var(--ok)"></i>Codex Plus</span
+          ><span class="meta">green</span>
+        </h4>
+        <div class="bar"><i style="width: 30%; background: var(--ok)"></i></div>
+        <div class="sub">5h 30% · weekly 18% · under</div>
+      </div>
+      <div class="g">
+        <h4>
+          <span><i class="dot" style="background: var(--c2)"></i>Budget · t3code</span
+          ><span class="meta">$9.40 / $25</span>
+        </h4>
+        <div class="bar"><i style="width: 38%; background: var(--c2)"></i></div>
+        <div class="sub">API-equiv · 3 tickets · 6/6 slots</div>
+      </div>
+    </div>
+    <div class="lane">
+      <header><span>Needs you · 3</span><span class="m">r respond · enter open</span></header>
+      <div class="inbox">
+        <div>
+          <span
+            ><i class="dot" style="background: var(--o-primary)"></i>#142 plan ready for approval ·
+            Opus 5.5</span
+          ><button class="btn p">Review plan</button>
+        </div>
+        <div>
+          <span
+            ><i class="dot" style="background: var(--warn)"></i>#142 implement stalled 9 min · no
+            tool calls</span
+          ><span><button class="btn">Nudge</button> <button class="btn">Cancel</button></span>
+        </div>
+        <div>
+          <span
+            ><i class="dot" style="background: var(--bad)"></i>#139 command approval · rm -rf
+            dist/</span
+          ><span><button class="btn">Allow</button> <button class="btn">Deny</button></span>
+        </div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="tick">
+        <span
+          ><b>#142 Add SSO login</b> &nbsp;<span class="m">PR #88 · worktree sso-login</span></span
+        ><span class="m">$3.10 / $5.00 ▓▓▓▓▓▓░░░</span>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="t"><span class="role">plan</span><span class="pill fr">frontier</span></div>
+          <div class="meta">Claude · Opus 5.5 · high</div>
+          <div class="st">✓ done · 4m · $0.60</div>
+          <div class="bb"><i style="width: 40%; background: var(--c3)"></i></div>
+        </div>
+        <div class="card stall need">
+          <div class="t">
+            <span class="role">implement</span><span class="pill std">standard</span>
+          </div>
+          <div class="meta">Claude · Sonnet 5.5 · medium ↓</div>
+          <div class="st">● running 12m · $1.90 · stalled 9m</div>
+          <div class="why">why: role implementation → standard; Claude amber → effort medium</div>
+          <div class="bb"><i style="width: 80%; background: var(--warn)"></i></div>
+        </div>
+        <div class="card">
+          <div class="t"><span class="role">verify</span><span class="pill cheap">cheap</span></div>
+          <div class="meta">Codex · GPT-6 Luna · low</div>
+          <div class="st">○ queued · waits on implement</div>
+          <div class="bb"><i style="width: 0%"></i></div>
+        </div>
+        <div class="card">
+          <div class="t">
+            <span class="role">review</span><span class="pill std">standard</span>
+          </div>
+          <div class="meta">Codex · GPT-6.1 Sol · high</div>
+          <div class="st">○ queued · other vendor (green)</div>
+          <div class="bb"><i style="width: 0%"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="tick">
+        <span
+          ><b>#140 Fix flaky upload test</b> &nbsp;<span class="m"
+            >worktree flaky-upload</span
+          ></span
+        ><span class="m">$0.80 / $5.00 ▓░░░░░░░░</span>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="t">
+            <span class="role">reproduce</span><span class="pill cheap">cheap</span>
+          </div>
+          <div class="meta">Claude · Haiku 5.5 · low</div>
+          <div class="st">✓ failing test written · $0.05</div>
+          <div class="bb"><i style="width: 5%; background: var(--c1)"></i></div>
+        </div>
+        <div class="card">
+          <div class="t">
+            <span class="role">fix + verify</span><span class="pill std">standard</span>
+          </div>
+          <div class="meta">Codex · GPT-6.1 Sol · medium</div>
+          <div class="st">✓ suite green · in merge queue #2 · $0.75</div>
+          <div class="bb"><i style="width: 15%; background: var(--c2)"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="lane">
+      <header>
+        <span>Merge queue · lane idle</span
+        ><span class="m">rebase → suite → merge-tree → merge</span>
+      </header>
+      <div class="mq">
+        <span>1 · #137 docs sweep · testing</span><span>2 · #140 flaky upload · waiting</span
+        ><span style="color: var(--bad)">bounced · #131 conflict in auth.ts → writer</span>
+      </div>
+    </div>
+    <div class="kb">
+      g t team · j/k move · enter drawer · s steer · x cancel · r respond · ? why this model · /
+      filter
+    </div>
+  </body>
+</html>
