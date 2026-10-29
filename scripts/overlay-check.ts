@@ -105,8 +105,11 @@ const git = (cwd: string, ...args: Array<string>) =>
     .split("\n")
     .filter(Boolean);
 
-// Deletions are not listed: nothing is left for the manifest to name.
 export const changedPaths = (cwd: string, base: string) =>
+  git(cwd, "diff", "--name-only", "--no-renames", `${base}...HEAD`, "--");
+
+// Deleted paths are left out: nothing is left for the manifest to name.
+export const presentPaths = (cwd: string, base: string) =>
   git(cwd, "diff", "--name-only", "--no-renames", "--diff-filter=ACMRT", `${base}...HEAD`, "--");
 
 export const newestMergedReleaseTag = (cwd: string) =>
@@ -151,7 +154,7 @@ const run = () => {
         "overlay-check: no upstream release tag in history; every non-owned change counts as an overlay change.",
       );
     }
-    const changed = overlayChangedPaths(root, diffPaths, tag);
+    const changed = overlayChangedPaths(root, presentPaths(root, base), tag);
     console.log(
       `overlay-check: ${diffPaths.length} paths changed since ${base}; ${changed.length} overlay changes to upstream files${tag ? ` (upstream ${tag})` : ""}.`,
     );

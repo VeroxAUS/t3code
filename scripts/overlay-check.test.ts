@@ -13,6 +13,7 @@ import {
   newestMergedReleaseTag,
   overlayChangedPaths,
   parseManifest,
+  presentPaths,
   reconcileManifest,
 } from "./overlay-check.ts";
 
@@ -82,6 +83,32 @@ it("requires a handoff when anything outside docs/overlay changes", () => {
   assert.isFalse(
     handoffRuleBroken(["apps/server/src/a.ts", "docs/overlay/handoffs/sync-v1.0.0.md"]),
   );
+});
+
+it("lists deleted paths so a deletion-only diff still needs a handoff", () => {
+  const dir = NodeFS.mkdtempSync(NodePath.join(NodeOS.tmpdir(), "overlay-check-"));
+  try {
+    const git = (...args: Array<string>) =>
+      NodeChildProcess.execFileSync(
+        "git",
+        ["-c", "user.name=test", "-c", "user.email=test@example.com", ...args],
+        { cwd: dir, encoding: "utf8" },
+      );
+    git("init", "-b", "main");
+    NodeFS.writeFileSync(NodePath.join(dir, "code.ts"), "export {};\n");
+    git("add", "-A");
+    git("commit", "-m", "base");
+    git("branch", "base");
+    git("rm", "code.ts");
+    git("commit", "-m", "delete");
+
+    const diff = changedPaths(dir, "base");
+    assert.deepEqual(diff, ["code.ts"]);
+    assert.isTrue(handoffRuleBroken(diff));
+    assert.deepEqual(presentPaths(dir, "base"), []);
+  } finally {
+    NodeFS.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 it("ignores paths a sync merge brought in unchanged from the upstream tag", () => {
