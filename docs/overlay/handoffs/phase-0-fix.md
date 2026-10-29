@@ -31,8 +31,11 @@ branch `overlay/phase-0-fix` · worktree `/home/verox/src/t3code-phase-0` · PR:
 ## Developer actions
 
 - After this PR merges: `gh workflow run overlay-release.yml --ref overlay/main -f version=0.1.3-overlay.1`, then `gh run watch <id>` and `gh release list`. Record the run URL and the draft `overlay-v0.1.3-overlay.1` with `T3-Code-*.exe`, its blockmap and `latest.yml` in the re-review.
+  Result: installer run https://github.com/VeroxAUS/t3code/actions/runs/40833226635 succeeded
+  Result: draft release overlay-v0.1.3-overlay.1 with T3-Code-0.1.3-overlay.1-x64.exe, .blockmap and latest.yml: https://github.com/VeroxAUS/t3code/releases/tag/untagged-5ecdc6ba2719b0a3a79a
 - After 2026-10-30 03:17 UTC: `gh run list --workflow overlay-sync.yml --json databaseId,event,conclusion,createdAt,url`; record the run with `event: schedule`. Do not dispatch another manual run in its place. If none appears, check that the workflow is enabled.
 - Usage-strip render pass (finding 2): either run it from a T3 Code session that has the Browser panel (seeded `vp run dev`, a provider with quota data such as `Replay (dev)`, one screenshot of the strip), or look at the strip yourself and record the environment, provider and screenshot here.
+  Result: usage strip renders with the Replay (dev) provider; screenshot at C:\Users\Thomas\status.png
 
 ## Open questions for the developer
 
