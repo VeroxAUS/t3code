@@ -37,6 +37,7 @@
 11. `fork-main` and `usage-strip` are archived, untouched; the usage strip and the Windows installer workflow are ported in Phase 0 steps 7 and 8; the old `fork-sync.yml` goes inert when `overlay/main` becomes the default branch (2026-10-29).
 12. Single machine only, no cloud VM: an always-on 32 GB VM costs about A$250/month after Hetzner's June 2026 price rise. Scheduled automations and night shifts run only while the PC is awake, so Phase 6 designs for missed and late runs (2026-10-29).
 13. Upstream's `ci.yml` and `mobile-fingerprint-check.yml` are disabled on the fork: they need upstream's Blacksmith runners and queue forever. PR CI is `overlay-check` (Phase 0 step 6) plus each thread's local `vp run check:changed`. Repository settings and workflow dispatches are developer actions, never agent actions (2026-10-29).
+14. The Max plan's monthly Claude API credit (US$100 on 5x, US$200 on 20x since 2026-10-07) is the cheap tier's first home: text generation from day one, the nightly digest by GitHub Actions cron, routing evals in Phase 2, and read-only Sonnet 5.5 fan-out in Phase 3, all through one `Claude Credit` provider instance with an API key. Writers stay on the subscription. Phase 0b spike 5 must first prove T3-launched turns bill as Agent SDK, not Claude Code. OpenCode's free models stay a fallback: time-limited, undocumented rate limits, some train on prompts. Max 20x is not justified by the credit alone; upgrade when the ledger shows the credit running out before the cycle ends (2026-10-29).
 
 ## Original questions
 

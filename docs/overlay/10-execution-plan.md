@@ -42,7 +42,7 @@ Rules
 - **Every step prompt names its model and effort** ("Run on") from the table in §1, and the handoff's Next line echoes it, so the recommendation is carried, not remembered.
 - **"Done, verified" lines carry the command and its one-line result.** A reviewer who finds a Done line without a command marks the phase `findings`.
 - **The review brief always checks:** the phase's exit criteria in `07-roadmap.md`, that phase's promoted-ideas rows, `CHANGES.md` against the `// overlay:` markers, tests at one layer for new logic, repo rules (no sleeps or polling in tests, no repo-wide checks, decoding defaults on settings), and the eval runs the repo requires for instruction-text changes.
-- **`scripts/overlay-check.ts` (Phase 0 step 6) runs on every PR and in the nightly sync.** It fails when the PR's changed upstream paths (anything outside the overlay-owned paths) and the manifest `docs/overlay/CHANGES.md` disagree in either direction, when a PR that changes any file outside `docs/overlay/` carries no file under `docs/overlay/handoffs/` (the tag sync writes `sync-<tag>.md`, so sync PRs pass), or when `vp test run packages/routing` fails. It is a required check on `overlay/main`.
+- **`scripts/overlay-check.ts` (Phase 0 step 6) runs on every PR and in the nightly sync.** It fails when the PR's changed upstream paths (anything outside the overlay-owned paths) and the manifest `docs/overlay/CHANGES.md` disagree in either direction, when a PR that changes upstream paths carries no file under `docs/overlay/handoffs/` (the tag sync writes `sync-<tag>.md`, so sync PRs pass), or when `vp test run packages/routing` fails. It is a required check on `overlay/main`.
 - **Gates that need time, not code.** Phase 3 opens only when `decisions.md` holds a developer-signed line "shadow report reviewed, matrix tuned", the decision log holds at least 14 days **and** 200 decisions with every role represented, and the Phase 3 canary in `07-roadmap.md` has passed. The final review (`prompts/_final-review.md`) opens only when the newest `phase-N-review*.md` of every phase has `status: passed` and `decisions.md` holds "overlay build in daily use since <date>" at least two weeks old.
 
 Handoff template (every link; state only, no prompt text)
@@ -189,7 +189,13 @@ Nothing here needs a model. Allow an afternoon. Each step says what the tool is,
 - Decide the plan upgrade (Max 20x recommended).
 - **Claude:** claude.ai → your profile → Settings → Billing (or Usage). Find "Extra usage" / "Usage credits" and make sure it is **off** with no prepaid balance. This is the only thing that stops Claude from billing past your window.
 - **ChatGPT:** chatgpt.com → Settings → Subscription. Buy no Codex credits; if an auto-reload or auto-purchase option exists, turn it off.
-- Optional: in T3 Code, Settings → the text-generation model setting (titles and triage) → Haiku 5.5 (promoted idea #26).
+- **Claude API credit (added 2026-10-29, before Phase 0b).** Max plans include US$100 (5x) or US$200 (20x) of Claude API credit a month; it is spent before purchased credit, expires each cycle, and needs no payment method. Claim it once, then give T3 an instance that uses it:
+  1. claude.ai → Settings → Billing → **API credits** → link a Claude Console organization (create one at platform.claude.com if you have none; you need Owner, Admin or Billing there). The link is permanent per plan, so link the organization you mean to keep. New subscribers wait 7 days.
+  2. platform.claude.com → Settings → Billing: confirm the balance under **Promotional credits**. Leave auto-reload off; with no purchased balance, requests simply stop when the credit is gone and nothing is ever charged to the plan.
+  3. platform.claude.com → Workspaces → create `t3-overlay` with a spend limit of US$90 (US$190 on 20x) → create one API key in it. Add the same key as the fork's repository secret `OVERLAY_API_KEY` for the Phase 1 digest workflow.
+  4. T3 Code → Settings → Providers → add a Claude instance named `Claude Credit`, binary path `claude`, `CLAUDE_CONFIG_DIR` `~/.claude_credit`, and under **Environment variables** `ANTHROPIC_API_KEY` = the key, marked Sensitive. The separate config directory keeps the subscription login from shadowing the key. Never sign in to that directory.
+  5. T3 Code → Settings → the text-generation setting → choose **Claude Credit → Claude Haiku 5.5**, effort Low (promoted idea #26). Titles, branch names, commit messages and PR descriptions now spend credit, not window share. Set **Thread title instructions** to: `Write a thread title of 3 to 6 words in the style of a task name: start with the key noun or action, sentence case, no quotes, trailing punctuation, emoji or filler such as "Help me" or "Can you". Keep ticket IDs, file names and function names exactly as written.` and on a second line `If the message is a launch line starting with "Run docs/overlay/prompts/", title it from the prompt path instead: "Phase N step k", "Phase N review", "Phase N fix" or "Phase N design".` The second line makes chain threads match their branch and handoff names.
+     Phase 0b spike 5 proves the billing lands on the credit and records the per-turn cost; the follow-on steps are marked _credit_ in `07-roadmap.md`.
 
 ### 2. WSL2: a real Linux inside Windows (30 minutes, one reboot)
 
@@ -359,6 +365,8 @@ Phases 0, 0b and 1 run in these plain CLIs inside Ubuntu. From Phase 2 the fork'
 
 ### 8. After each thread (repeat for every step)
 
+Shortcut: `tools/overlay-next.sh`, installed as `overlay-next` in `~/.local/bin`, does everything below with a confirmation before the merge: commits pending answers, flags unanswered questions, pushes, opens the PR if missing, merges with a merge commit, starts the next branch, walks you through developer actions, and copies the next launch line to the clipboard. The manual steps stay here as the reference.
+
 ```bash
 cd ~/src/t3code-phase-0
 cat docs/multi-agent-harness/handoffs/phase-0-step-0.md    # docs/overlay/handoffs/... from step 5 onward
@@ -394,4 +402,4 @@ git fetch origin && git switch -c overlay/phase-0-review origin/overlay/main
 codex --model gpt-6.1-sol -c model_reasoning_effort=low
 ```
 
-Paste the complete handoff's `Next` line. A passed review hands you the Phase 0b design-round launch line; run it on Opus 5.5 High (`claude`, `/model opus`, `/effort high`). Phase 0b's four contract spikes settle token semantics, replay durability, real role permissions and candidate workspaces before the Phase 1 design round writes any Phase 1 prompt.
+Paste the complete handoff's `Next` line. A passed review hands you the Phase 0b design-round launch line; run it on Opus 5.5 High (`claude`, `/model opus`, `/effort high`). Phase 0b's five contract spikes settle token semantics, replay durability, real role permissions, candidate workspaces and the API-credit billing route before the Phase 1 design round writes any Phase 1 prompt. Do §8.1's Claude API credit steps before launching the design round, so spike 5 has an instance to test.
