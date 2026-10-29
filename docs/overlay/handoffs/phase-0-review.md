@@ -17,6 +17,8 @@ supersedes: docs/overlay/handoffs/phase-0-complete.md
 
 ## Done, verified
 
+- Review PR: https://github.com/VeroxAUS/t3code/pull/11 into overlay/main; implementation unchanged.
+
 - Read all Phase 0 handoffs, roadmap Phase 0, cited fork/architecture guidance, manifest, relevant final-review briefs, and the named PR diffs (6–10, including deliberate red PR 8). Reviewed the cumulative code diff from v0.1.3 for the earlier steps. No implementation fixes made.
 - From each owning package, ran `/home/verox/src/t3code-phase-0/node_modules/.bin/vp test run <paths>`: contracts `src/settings.test.ts` → 30 passed; shared `src/projectSettings.test.ts` → 21 passed; desktop `src/updates` → 63 passed; server `src/telemetry src/cloud` → 22 files / 190 tests passed; scripts `overlay-check.test.ts` → 6 passed; routing `src` → 1 passed. Server and scripts fixtures initially hit sandbox EPERM; their authorized reruns passed.
 - `node scripts/overlay-check.ts --base v0.1.3` → pass, 20 upstream overlay files reconciled. Compared `rg -l '// overlay:'` outside docs with the manifest: all 17 marked paths match; remaining three entries are package JSON files and the lockfile. Current tree markers and manifest agree.
