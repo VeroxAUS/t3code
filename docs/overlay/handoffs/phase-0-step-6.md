@@ -62,6 +62,7 @@ branch `overlay/phase-0-step-6` · worktree `/home/verox/src/t3code-phase-0` · 
 ## Open questions for the developer
 
 - Is the widened handoff rule (any file outside `docs/overlay/`) what you want, or should overlay-owned-only PRs pass without one? The Accept test requires the wider reading.
+  Answer: Keep the wider rule. Any change outside docs/overlay/ needs a handoff, including overlay-owned paths like packages/routing. Every thread writes one anyway.
 
 ## Next
 
