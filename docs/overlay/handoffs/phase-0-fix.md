@@ -37,7 +37,7 @@ branch `overlay/phase-0-fix` · worktree `/home/verox/src/t3code-phase-0` · PR:
 ## Open questions for the developer
 
 - Who runs the usage-strip render pass, given this thread had no Browser panel? The re-review cannot clear finding 2 without it.
-  Recommended: a fresh fix thread launched from inside the T3 Code app on this worktree — it is the only place the Browser panel tools exist.
+  Answer: The developer runs the render pass by hand before the re-review and records the result and screenshot path under Developer actions.
 
 ## Next
 
