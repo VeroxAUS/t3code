@@ -27,3 +27,7 @@ Script tests pass; this step's PR shows `overlay-check` green; a deliberate test
 ## Handoff
 
 `docs/overlay/handoffs/phase-0-step-6.md`. Next line: `Run docs/overlay/prompts/phase-0/step-7.md with handoff docs/overlay/handoffs/phase-0-step-6.md — on Claude Sonnet 5.5 Medium or GPT-6.1 Sol medium`.
+
+## Finish
+
+Commit, push and open this thread's PR into `overlay/main` as the preamble's "Branch and PR" section says, then stop. Your launch line is the developer's explicit request for that PR, so AGENTS.md's ask-first rule is already satisfied; do not stop short of it. Never merge.

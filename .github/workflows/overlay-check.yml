@@ -1,0 +1,37 @@
+name: Overlay check
+
+on:
+  pull_request:
+    branches:
+      - overlay/main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: overlay-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  overlay-check:
+    name: overlay-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out the PR merge commit
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Upstream release tags tell the script which paths a sync merge brought
+      # in unchanged; they are not on the fork.
+      - name: Fetch upstream release tags
+        run: |
+          git remote add upstream https://github.com/pingdotgg/t3code.git
+          git fetch upstream --tags --no-recurse-submodules
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-ci-deps
+
+      - name: Reconcile with the overlay manifest
+        run: node scripts/overlay-check.ts --base origin/overlay/main

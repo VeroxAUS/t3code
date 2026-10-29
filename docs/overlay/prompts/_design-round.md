@@ -20,6 +20,8 @@ Read `_preamble.md`. Gate: the named handoff is the review of the previous phase
 
 ## Finish
 
+Commit, push and open this thread's PR into `overlay/main` as the preamble's "Branch and PR" section says, then stop. Your launch line is the developer's explicit request for that PR, so AGENTS.md's ask-first rule is already satisfied; do not stop short of it. Never merge. Every step prompt you write ends with a `## Finish` section containing this paragraph word for word.
+
 One markdown-only PR titled `overlay: phase N design round`. The developer approves the prompts in that PR. Write `DOCS/handoffs/phase-N-design.md` with:
 
 ```
