@@ -62,6 +62,7 @@ Exit criteria from `docs/overlay/07-roadmap.md` Phase 0. A line without a comman
 ## Open questions for the developer
 
 - The step-7 thread was told to run one dev pass (`Replay (dev)` provider, one screenshot). It had already stopped. Should a thread do it now (a fresh `fix` thread, or this one on your word), or will you look at the strip yourself and record it above?
+  Answer: Neither now. Let the Phase 0 review flag the missing evidence; its fix thread runs the dev pass and records the screenshot.
 
 ## Next
 
