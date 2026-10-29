@@ -1,0 +1,176 @@
+name: Overlay sync
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: overlay-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Merge newest upstream release tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ secrets.OVERLAY_SYNC_TOKEN }}
+      OVERLAY_SYNC_TOKEN: ${{ secrets.OVERLAY_SYNC_TOKEN }}
+    steps:
+      # GITHUB_TOKEN pushes and PRs trigger no workflows, so the PAT is mandatory.
+      - name: Require OVERLAY_SYNC_TOKEN
+        run: |
+          if [ -z "$OVERLAY_SYNC_TOKEN" ]; then
+            echo "::error::Secret OVERLAY_SYNC_TOKEN is missing. Add a fine-grained PAT with contents, pull requests and issues write. This job never pushes to overlay/main with GITHUB_TOKEN."
+            exit 1
+          fi
+
+      - name: Check out overlay/main
+        uses: actions/checkout@v6
+        with:
+          ref: overlay/main
+          fetch-depth: 0
+          token: ${{ secrets.OVERLAY_SYNC_TOKEN }}
+
+      - name: Find the newest unmerged upstream release tag
+        id: tag
+        run: |
+          git config user.name "overlay-sync"
+          git config user.email "overlay-sync@users.noreply.github.com"
+          git remote add upstream https://github.com/pingdotgg/t3code.git
+          git fetch upstream --tags --no-recurse-submodules
+          # Release tags are plain vX.Y.Z; nightlies and previews carry a suffix.
+          tag=""
+          for candidate in $(git tag --list 'v*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$'); do
+            if ! git merge-base --is-ancestor "refs/tags/$candidate" origin/overlay/main; then
+              tag="$candidate"
+              break
+            fi
+          done
+          if [ -z "$tag" ]; then
+            echo "No upstream release tag is missing from overlay/main; nothing to do."
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Newest unmerged upstream release tag: $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Merge the tag into overlay/sync
+        id: merge
+        if: steps.tag.outputs.tag != ''
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          open_prs="$(gh pr list --head overlay/sync --base overlay/main --state open --json number --jq 'length')"
+          if [ "$open_prs" != "0" ] && git ls-remote --exit-code --heads origin overlay/sync >/dev/null; then
+            echo "Appending to the open overlay/sync PR branch."
+            git fetch origin overlay/sync
+            git switch -C overlay/sync origin/overlay/sync
+          else
+            git switch -C overlay/sync origin/overlay/main
+          fi
+
+          if git merge-base --is-ancestor "refs/tags/$TAG" HEAD; then
+            echo "overlay/sync already contains $TAG."
+            echo "merged=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if git merge --no-edit "refs/tags/$TAG"; then
+            echo "merged=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git diff --name-only --diff-filter=U > "$RUNNER_TEMP/conflicts.txt"
+          git merge --abort
+          {
+            echo "Merging upstream \`$TAG\` into \`overlay/sync\` conflicted in:"
+            echo
+            sed 's/^/- `/; s/$/`/' "$RUNNER_TEMP/conflicts.txt"
+            echo
+            echo "Manifest lines naming these files:"
+            echo
+            manifest=""
+            for dir in docs/overlay docs/multi-agent-harness; do
+              if [ -f "$dir/CHANGES.md" ]; then manifest="$dir/CHANGES.md"; break; fi
+            done
+            found=0
+            if [ -n "$manifest" ]; then
+              while IFS= read -r file; do
+                if grep -nF -- "$file" "$manifest" | sed 's/^/- /'; then found=1; fi
+              done < "$RUNNER_TEMP/conflicts.txt"
+            fi
+            if [ "$found" = 0 ]; then echo "- none (no manifest found or no line names these files)"; fi
+            echo
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } > "$RUNNER_TEMP/issue-body.md"
+
+          existing="$(gh issue list --state open --search 'in:title "overlay sync conflict"' --json number,title --jq '[.[] | select(.title == "overlay sync conflict")][0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --body-file "$RUNNER_TEMP/issue-body.md"
+          else
+            gh issue create --title "overlay sync conflict" --body-file "$RUNNER_TEMP/issue-body.md"
+          fi
+          echo "::error::Merge of $TAG conflicted; see the 'overlay sync conflict' issue."
+          exit 1
+
+      - name: Write the sync handoff and open the PR
+        if: steps.tag.outputs.tag != ''
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+          MERGED: ${{ steps.merge.outputs.merged }}
+        run: |
+          handoff_dir=docs/overlay/handoffs
+          [ -d docs/overlay ] || handoff_dir=docs/multi-agent-harness/handoffs
+          handoff="$handoff_dir/sync-$TAG.md"
+
+          if [ "$MERGED" = true ] || [ ! -f "$handoff" ]; then
+            mkdir -p "$handoff_dir"
+            merge_sha="$(git rev-parse HEAD)"
+            git diff --name-only origin/overlay/main...HEAD -- . ":(exclude)$handoff" > "$RUNNER_TEMP/touched.txt"
+            {
+              echo "# Handoff · Sync · $TAG · $(date -u +%F) · written by overlay-sync"
+              echo "commit: $merge_sha"
+              echo "supersedes: none"
+              echo
+              echo "## Done, verified"
+              echo
+              echo "- Merged upstream \`$TAG\` into \`overlay/sync\` — proof: \`git merge --no-edit refs/tags/$TAG\` -> clean, no overlay conflict"
+              echo "- Files touched relative to \`overlay/main\` ($(wc -l < "$RUNNER_TEMP/touched.txt") files):"
+              sed 's/^/  - /' "$RUNNER_TEMP/touched.txt" | head -200
+            } > "$handoff"
+            git add "$handoff"
+            git commit -m "overlay: sync handoff for $TAG"
+          fi
+
+          git push origin overlay/sync
+
+          body="Merges upstream \`$TAG\` into \`overlay/main\`. No overlay conflict. See \`$handoff\`."
+          existing="$(gh pr list --head overlay/sync --base overlay/main --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "overlay sync $TAG" --body "$body"
+          else
+            gh pr create --head overlay/sync --base overlay/main --title "overlay sync $TAG" --body "$body"
+          fi
+
+      # First signal only; the PR's own checks are authoritative.
+      - name: Setup dependencies
+        if: steps.tag.outputs.tag != ''
+        uses: ./.github/actions/setup-ci-deps
+
+      - name: Check changed files
+        if: steps.tag.outputs.tag != ''
+        run: vp run check:changed
+
+      - name: Test routing package
+        if: steps.tag.outputs.tag != ''
+        run: |
+          if [ -d packages/routing ]; then
+            vp test run packages/routing
+          else
+            echo "packages/routing does not exist yet; skipping."
+          fi
