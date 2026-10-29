@@ -58,6 +58,7 @@ branch `overlay/phase-0-step-6` · worktree `/home/verox/src/t3code-phase-0` · 
   ```
 
   Record the response's `required_status_checks.checks` in the step-7 thread.
+  Result: [{"app_id": 15368,"context": "overlay-check"}]
 
 ## Open questions for the developer
 
