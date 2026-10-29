@@ -1,12 +1,12 @@
 # Handoff · Phase 0 · Step 5 · 2026-10-29 · written by Claude Sonnet 5.5 / Medium
 
-commit: c47a6e6dfda3fad2354b52a9494f5db9f7a19c14 (base; step-5 changes are uncommitted in the worktree)
+commit: 5ad191f4bf3baa5ae696b8065ba694b08247ec28
 supersedes: docs/overlay/handoffs/phase-0-step-4.md
 status: n/a
 
 ## Where we are
 
-branch `overlay/phase-0-step-5` · worktree `/home/verox/src/t3code-phase-0` · PR: none yet (not asked for) · CI not yet run
+branch `overlay/phase-0-step-5` · worktree `/home/verox/src/t3code-phase-0` · PR: https://github.com/VeroxAUS/t3code/pull/6 · CI not yet run
 
 ## Done, verified
 
