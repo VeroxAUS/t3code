@@ -8,7 +8,7 @@ One thread in a chain building the multi-agent overlay on this T3 Code fork (`Ve
 
 ## Paths
 
-`DOCS` means `docs/overlay/`.
+`DOCS` means `docs/overlay/` if that folder exists, otherwise `docs/multi-agent-harness/`. Phase 0 step 5 moves it.
 
 ## Gate
 
@@ -37,7 +37,7 @@ If the file's `status` or kind does not match what your prompt accepts, stop and
 - Tests: `it.effect` on a TestClock; no sleeps, polling, wall-clock or per-test timeouts; drain the effect worker (`OrchestrationEffectWorkerV2` in `apps/server/src/orchestration-v2/EffectWorker.ts`). New non-trivial logic ships with one test at the lowest layer that fails without it.
 - Every settings field has a decoding default.
 - Never touch `~/.t3/userdata`. Kill only PIDs you captured at spawn. Start a dev server with `setsid vp run dev > /tmp/dev.log 2>&1 &` and stop it with `kill -- -<that PID>`, so the server and web children die with it.
-- **Manifest.** `DOCS/CHANGES.md` lists every upstream file the overlay has changed, one line each: path, reason, and whether it carries a `// overlay:` marker. Any file outside the overlay-owned paths is upstream. Add a `// overlay: <reason>` comment on changed lines where the file type allows comments; JSON, YAML without comments and lockfiles get a manifest line only. `scripts/overlay-check.ts` fails a PR whose changed upstream paths and manifest disagree in either direction. Overlay-owned paths: `packages/routing`, `apps/server/src/routing`, `apps/web/src/components/team`, `evals/routing`, `scripts/overlay-check.ts`, `scripts/overlay-check.test.ts`, `.github/workflows/overlay-*.yml`, `DOCS`.
+- **Manifest.** `DOCS/CHANGES.md` lists every upstream file the overlay has changed, one line each: path, reason, and whether it carries a `// overlay:` marker. Any file outside the overlay-owned paths is upstream. Add a `// overlay: <reason>` comment on changed lines where the file type allows comments; JSON, YAML without comments and lockfiles get a manifest line only. `scripts/overlay-check.ts` fails a PR whose changed upstream paths and manifest disagree in either direction. Overlay-owned paths: `packages/routing`, `apps/server/src/routing`, `apps/web/src/components/team`, `evals/routing`, `scripts/overlay-check.ts`, `.github/workflows/overlay-*.yml`, `DOCS`.
 - Tests run through the repo-local binary from the package directory: `cd <package> && <repo>/node_modules/.bin/vp test run <files>`. The global `vp` on PATH breaks every `@effect/vitest` file with `Cannot read properties of undefined (reading 'config')`. `vp run check:changed` from the repo root is fine.
 - **Developer actions.** Never change repository settings (branch protection, required checks, Actions settings, secrets) and never dispatch a workflow or publish a release; the permission layer denies these and they belong to the developer. List each under `## Developer actions` in your handoff: the exact command, when to run it (most need this PR merged first), and what to record. Then finish the rest of the step. Pushing your branch and opening or closing PRs are yours.
 - Scope is the prompt. Something adjacent looks wrong: write it under "Open questions", do not fix it.
@@ -59,7 +59,9 @@ supersedes: <the handoff named in your launch line, or none>
 status: <passed | findings, review links only>
 ```
 
-Write every path in the handoff with `DOCS` already resolved (for example `docs/overlay/prompts/...`), so the Next line can be pasted as is. Then where we are, done with the proving command and its one-line result (mutations such as a workflow dispatch or a PR creation carry their URL as evidence instead), not done, decisions, gotchas, developer actions, open questions, and one `Next` line of the form:
+Write every path in the handoff with `DOCS` already resolved (for example `docs/multi-agent-harness/prompts/...`), so the Next line can be pasted as is. Then where we are, done with the proving command and its one-line result (mutations such as a workflow dispatch or a PR creation carry their URL as evidence instead), not done, decisions, gotchas, developer actions, open questions, and one `Next` line of the form below. Write each open question as one `- ` bullet, followed on the next line by `  Recommended: <the answer you would choose> — <one-line reason>`. The developer accepts it or overrides it with an `  Answer:` line; you never act on your own recommendation. Write `- none` when there are no questions.
+
+Next line:
 
 ```
 Next: Run DOCS/prompts/<file> [for phase N] with handoff DOCS/handoffs/<this file> — on <model and effort named in that prompt>

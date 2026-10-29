@@ -55,8 +55,11 @@ Exit criteria from `docs/overlay/07-roadmap.md` Phase 0. A line without a comman
   ```
 
   Then `gh run watch <id>` and `gh release list` -> the draft `overlay-v0.1.3-overlay.1` with `T3-Code-*.exe`, its blockmap and `latest.yml`. Edit this file and the review checks it.
+  Result: Run failed at checkout: https://github.com/VeroxAUS/t3code/actions/runs/40830883262
+  Cause: `persist-credentials: false` on the build job's checkout makes actions/checkout run `git submodule foreach`, which fails on upstream's orphan gitlinks under `.repos/alchemy-effect/submodules/`. Fix: remove that line (overlay-check uses the default and works). Re-dispatch after the fix.
 
 - Set `textGenerationModelSelection` to Haiku 5.5 in your own settings (#26) and note it above.
+  Result: Done, set to Haiku 5.5 in the T3 Code app settings.
 - Answer the usage-strip dev pass question below.
 
 ## Open questions for the developer
