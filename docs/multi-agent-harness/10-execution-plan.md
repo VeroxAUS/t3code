@@ -367,8 +367,10 @@ cat docs/multi-agent-harness/handoffs/phase-0-step-0.md    # docs/overlay/handof
 Read it. Answer any "Open questions" by editing that file inline and committing on the thread's branch (`git add -A && git commit -m "handoff: answers" && git push`). Merge the PR once its checks are green:
 
 ```bash
+gh repo set-default VeroxAUS/t3code   # once; without it gh may target upstream
 gh pr list
-gh pr merge <number> --merge --delete-branch
+gh pr merge <number> --merge
+git push origin --delete overlay/phase-0-step-0     # the branch you just merged
 ```
 
 Use `--merge` (a merge commit), not squash: handoffs record branch commit SHAs, and squashing would make them unfindable. Then start the next step on a fresh branch from the updated integration branch:
@@ -376,6 +378,7 @@ Use `--merge` (a merge commit), not squash: handoffs record branch commit SHAs, 
 ```bash
 git fetch origin
 git switch -c overlay/phase-0-step-1 origin/overlay/main
+git branch -D overlay/phase-0-step-0                 # the merged branch, now safe to drop
 claude --permission-mode acceptEdits      # or codex, whichever vendor is green
 ```
 
