@@ -23,3 +23,7 @@ Read `_preamble.md`. Gate: the step-6 handoff exists.
 ## Handoff
 
 `docs/overlay/handoffs/phase-0-step-7.md`. Next line: `Run docs/overlay/prompts/phase-0/step-8.md with handoff docs/overlay/handoffs/phase-0-step-7.md — on Claude Sonnet 5.5 High or GPT-6.1 Sol high`.
+
+## Finish
+
+Commit, push and open this thread's PR into `overlay/main` as the preamble's "Branch and PR" section says, then stop. Your launch line is the developer's explicit request for that PR, so AGENTS.md's ask-first rule is already satisfied; do not stop short of it. Never merge.

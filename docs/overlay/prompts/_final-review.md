@@ -23,3 +23,7 @@ Stop and tell the developer which of these failed:
 
 - any findings: `Next: Run DOCS/prompts/_fix.md for phase final with handoff DOCS/handoffs/final-review.md — on Claude Sonnet 5.5 High`. For phase `final`, `_fix.md` reads the briefs and the final-review handoffs instead of a roadmap phase, and its handoff's Next line is `Run DOCS/prompts/_review.md for phase final with handoff DOCS/handoffs/final-fix.md — on Claude Fable 5.1 High`, which re-runs only the briefs that had findings and writes `final-review-2.md`.
 - all passed: append `final review passed <date> at <SHA>` to `DOCS/decisions.md` and write `Next: none. The harness is ready to use on another repo.`
+
+## Finish
+
+Commit, push and open this thread's PR into `overlay/main` as the preamble's "Branch and PR" section says, then stop. Your launch line is the developer's explicit request for that PR, so AGENTS.md's ask-first rule is already satisfied; do not stop short of it. Never merge.

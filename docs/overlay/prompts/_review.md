@@ -30,3 +30,7 @@ Read `_preamble.md`. Gate: the named handoff exists (a complete handoff for a fi
 - findings: `Next: Run DOCS/prompts/_fix.md for phase N with handoff DOCS/handoffs/<this file> — on <execute model and effort>`
 
 A re-review after a fix uses this same prompt with the fix handoff, one effort level lower, and writes `phase-N-review-2.md`.
+
+## Finish
+
+Commit, push and open this thread's PR into `overlay/main` as the preamble's "Branch and PR" section says, then stop. Your launch line is the developer's explicit request for that PR, so AGENTS.md's ask-first rule is already satisfied; do not stop short of it. Never merge.
