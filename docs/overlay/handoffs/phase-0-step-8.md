@@ -1,12 +1,12 @@
 # Handoff · Phase 0 · Step 8 · 2026-10-29 · written by Claude Sonnet 5.5 / High
 
-commit: PENDING
+commit: 0f0c6e548870ff3df2d77263f3888390cec75694
 supersedes: docs/overlay/handoffs/phase-0-step-7.md
 status: n/a
 
 ## Where we are
 
-branch `overlay/phase-0-step-8` · worktree `/home/verox/src/t3code-phase-0` · PR: PENDING
+branch `overlay/phase-0-step-8` · worktree `/home/verox/src/t3code-phase-0` · PR: https://github.com/VeroxAUS/t3code/pull/10
 
 ## Done, verified
 
@@ -16,7 +16,7 @@ branch `overlay/phase-0-step-8` · worktree `/home/verox/src/t3code-phase-0` · 
 - `fork-sync.yml` is absent from `overlay/main` — proof: `git ls-tree --name-only origin/overlay/main .github/workflows/fork-sync.yml | wc -l` -> `0`; `git ls-tree --name-only origin/fork-main .github/workflows/fork-sync.yml` -> `.github/workflows/fork-sync.yml`. `.fork/` is also absent from `overlay/main` (`git ls-tree -r --name-only origin/overlay/main | grep -c '^\.fork/'` -> `0`).
 - No manifest line: the only new file is under `.github/workflows/overlay-*.yml`, an overlay-owned path.
 - `docs/overlay/handoffs/phase-0-complete.md` written with every exit criterion, its evidence, the promoted-ideas checklist and the review Next line.
-- Changed-files check — proof: `vp run check:changed` -> `pass` for unused patches, format, lint, knip 1/2 and 2/2, graphql, typecheck (37 packages), test (7 files, 108 tests); `node scripts/overlay-check.ts --base origin/overlay/main` -> see PR check
+- Changed-files check — proof: `vp run check:changed` -> `pass` for unused patches, format, lint, knip 1/2 and 2/2, graphql, typecheck (37 packages), test (7 files, 108 tests); `node scripts/overlay-check.ts --base origin/overlay/main` -> `overlay-check: pass`
 
 ## Not done / deferred
 

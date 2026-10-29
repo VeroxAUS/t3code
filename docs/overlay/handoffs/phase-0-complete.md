@@ -1,12 +1,12 @@
 # Handoff · Phase 0 · Complete · 2026-10-29 · written by Claude Sonnet 5.5 / High
 
-commit: PENDING
+commit: 0f0c6e548870ff3df2d77263f3888390cec75694
 supersedes: docs/overlay/handoffs/phase-0-step-8.md
 status: n/a
 
 ## Where we are
 
-branch `overlay/phase-0-step-8` · worktree `/home/verox/src/t3code-phase-0` · PR: PENDING · every step PR (1 to 9) is merged except this one.
+branch `overlay/phase-0-step-8` · worktree `/home/verox/src/t3code-phase-0` · PR: https://github.com/VeroxAUS/t3code/pull/10 · every step PR (1 to 9) is merged except this one.
 
 ## Done, verified
 
