@@ -35,7 +35,7 @@ Keep T3 Code as the base. It already has the expensive parts: ten provider adapt
 11. `11-single-machine-and-cloud.md` — running on one machine, when a VM is worth it, cloud options.
 12. `12-ui-ux.md` — the team view hub design; mockup in `mockups/team-view.html`.
 
-Thread prompts live in `prompts/`: `_preamble.md` (every thread reads it first), `_design-round.md`, `_review.md`, `_fix.md`, and `phase-0/step-0.md` to `step-6.md`. Later phases' step prompts are written by each phase's design round. Start any thread with one line: `Run <prompt file> [for phase N] with handoff <handoff file>`. Phase 0 starts with `Run docs/multi-agent-harness/prompts/phase-0/step-0.md with handoff none` on Sonnet 5.5 Medium.
+Thread prompts live in `prompts/`: `_preamble.md` (every thread reads it first), `_design-round.md`, `_review.md`, `_fix.md`, `_ask.md` (a question thread outside the chain; edits only `inbox.md`), and `phase-0/step-0.md` to `step-6.md`. Later phases' step prompts are written by each phase's design round. Start any thread with one line: `Run <prompt file> [for phase N] with handoff <handoff file>`. Phase 0 starts with `Run docs/multi-agent-harness/prompts/phase-0/step-0.md with handoff none` on Sonnet 5.5 Medium.
 
 ## Assumptions these docs make
 

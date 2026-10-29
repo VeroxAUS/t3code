@@ -8,7 +8,7 @@ Read `_preamble.md`. Gate: the named handoff is the review of the previous phase
 
 ## Read
 
-`DOCS/07-roadmap.md` (Phase N and the "Promoted from the backlog" table), `DOCS/08-idea-backlog.md`, the design docs that phase cites, `DOCS/decisions.md`, every handoff of the previous phase, `DOCS/spikes/*.md` when they exist, and `DOCS/prompts/phase-0/` as the model for step prompts.
+`DOCS/07-roadmap.md` (Phase N and the "Promoted from the backlog" table), `DOCS/08-idea-backlog.md`, `DOCS/inbox.md` (questions queued by `_ask.md` threads; each becomes a doc edit, a deferral or a drop, recorded in `decisions.md`, and the line is removed), the design docs that phase cites, `DOCS/decisions.md`, every handoff of the previous phase, `DOCS/spikes/*.md` when they exist, and `DOCS/prompts/phase-0/` as the model for step prompts.
 
 ## Do, with the developer in the loop
 
