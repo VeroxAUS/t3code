@@ -6,7 +6,7 @@ status: n/a
 
 ## Where we are
 
-branch `overlay/phase-0-fix` · worktree `/home/verox/src/t3code-phase-0` · PR: pending · two of four findings fixed in code, two need the developer or time.
+branch `overlay/phase-0-fix` · worktree `/home/verox/src/t3code-phase-0` · PR: https://github.com/VeroxAUS/t3code/pull/12 · two of four findings fixed in code, two need the developer or time.
 
 ## Done, verified
 
