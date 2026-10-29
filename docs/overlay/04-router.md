@@ -84,8 +84,8 @@ Config in `overlay.budgets` (project-scoped via `projectSettingsOverrides`):
 
 ```ts
 type BudgetsSettings = {
-  perRootThreadUsd?: number; // default 5; admission cap on landed + reserved
-  perChildUsd?: number; // default 1.5; reserved per launch until usage lands
+  perRootThreadUsd?: number; // default 5; admission cap on landed + reserved; entered and shown in the display currency (03 rule 8), stored USD
+  perChildUsd?: number; // default 1.5; reserved per launch until usage lands; same
   maxConcurrentChildrenPerRoot?: number; // default 3
   maxChildrenLifetimePerRoot?: number; // default 12
   maxAttemptsPerStep?: number; // default 2
@@ -106,7 +106,7 @@ Mechanism:
 - **Failure code** `budget_exceeded` carries a sentence the agent relays ("Root budget $5.00 reached: $4.20 landed, $1.50 reserved; ask the user to raise it or finish without more delegates").
 - **Alerts** at 75/90/100% of the root cap reuse the notification path (server `NotificationMailbox.ts`, web `ThreadNotificationCoordinator`) and mobile push, labelled "planning cap, API-equivalent".
 
-Budgets are API-equivalent dollars on subscriptions; say so in the UI every time. Claude Code's own `--max-budget-usd` has the same semantics and the same surprise on Max plans.
+Budgets are API-equivalent dollars on subscriptions, shown in the display currency (AUD by default, 03 rule 8); say so in the UI every time. Claude Code's own `--max-budget-usd` has the same semantics and the same surprise on Max plans.
 
 ## Decision log and explainability
 

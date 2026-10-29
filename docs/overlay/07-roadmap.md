@@ -23,7 +23,7 @@ Exit: sync job green once by `workflow_dispatch` (green with nothing to merge, o
 
 ## Phase 0b · Contract spikes (3–4 days)
 
-Four short investigations against the pinned upstream revision, each producing a doc under `docs/overlay/spikes/` with command evidence and, where useful, a fixture or test. They settle the assumptions Phases 1 to 4 rest on, so the Phase 1 design round edits 03, 04 and 05 from facts rather than guesses. Step prompts are written by the Phase 0b design round.
+Five short investigations against the pinned upstream revision, each producing a doc under `docs/overlay/spikes/` with command evidence and, where useful, a fixture or test. They settle the assumptions Phases 1 to 4 rest on, so the Phase 1 design round edits 03, 04 and 05 from facts rather than guesses. Step prompts are written by the Phase 0b design round.
 
 Steps
 
@@ -31,8 +31,9 @@ Steps
 2. Replay durability. In a test only, prototype the ledger's durable turn identity, idempotent cumulative upsert and transactional cursor against the event store; prove crash mid-turn, duplicate delivery and late correction. Output: `spikes/replay-durability.md`.
 3. Permissions. For Claude and Codex (and OpenCode if enabled), run a child under `interactionMode: plan` and under `approval-required`; record what is blocked, what prompts, and what is unrestricted, including writes through shell commands. Output: `spikes/permissions-map.md`, the capability map the role briefs cite.
 4. Candidate workspaces. Prove `t3_thread_launch` with `workspaceStrategy: worktree` at a specific commit (`baseRef` = SHA) and `existing_worktree` attach; record the verifier recipe and what untracked state each carries. Output: `spikes/candidate-workspace.md`.
+5. API credit. Since 2026-10-07 Max plans include monthly Claude API credit (US$100 on 5x, US$200 on 20x; expires each cycle, no rollover) that Anthropic's docs say covers the Claude API, the Message Batches API and the Agent SDK with an API key, but not Claude Code, the GitHub Action, IDE extensions or the desktop app. T3's Claude provider is the Agent SDK launched by T3's own server, so it should bill as Agent SDK; nobody has published a test of a third-party harness, so this spike proves it. Against the `Claude Credit` provider instance the developer created (`10-execution-plan.md` §8.1): (a) note the Promotional credits balance on `platform.claude.com/settings/billing` and the Max usage strip; (b) run one Haiku 5.5 turn and one Sonnet 5.5 turn through T3 on that instance and record each `turnTokenUsage` (these are the Haiku captures step 1 wants); (c) regenerate one thread title with the text-generation setting on that instance; (d) from a script with the same key, submit one Message Batches request on Haiku 5.5 and fetch its result; (e) note the balance and the strip again. Pass: the turns, the title and the batch all moved the credit balance and not the Max windows, the batch billed at half price, and the API key sat in the instance's environment with its own `CLAUDE_CONFIG_DIR` so the subscription login never shadowed it. Output: `spikes/api-credit.md` with a `go` or `no-go` line, the measured USD of each turn, and the balance before and after. `go` puts the steps marked _credit_ in Phases 1 to 3 in scope; `no-go` drops them, and the credit is spent only by scripts outside T3 (the nightly digest), which work either way.
 
-Exit: four spike docs with command evidence; `decisions.md` records which assumptions in 03, 04 and 05 changed; the Phase 1 design round reads them.
+Exit: five spike docs with command evidence; `decisions.md` records which assumptions in 03, 04 and 05 changed and whether the credit route is `go`; the Phase 1 design round reads them.
 
 ## Phase 1 · Cost ledger + pressure (1.5–2 weeks)
 
@@ -43,10 +44,12 @@ Steps
 3. RPC `routing.getThreadCosts` in `packages/contracts/src/rpc.ts` + handler in `ws.ts` (follow `server.getUsageSummary`).
 4. `packages/routing/src/pressure.ts` + table tests; `apps/server/src/routing/Pressure.ts` adapter with hysteresis state; push `pressure` on the `serverConfig` stream.
 5. Hook 3: `capabilities` appends `usage.band` per provider.
-6. UI: cost chip in `SidebarThreadRow.tsx` and `ThreadLineageWorkflowRow.tsx`; band dot in the model picker; mobile thread list chip.
+6. UI: cost chip (display currency, 03 rule 8; settings `overlay.ledger.display`) in `SidebarThreadRow.tsx` and `ThreadLineageWorkflowRow.tsx`; band dot in the model picker; mobile thread list chip.
 
 7. RPC `routing.rebuildLedger` (reset the cursor and replay from the persisted event log; live events queue behind the replay) and `routing.repriceLedger`, with tests for crash mid-turn, duplicate delivery, late correction, partial then complete usage, a rate change then reprice, and rebuild equals live.
 8. Promoted ideas for this phase (table at the end), one PR each.
+9. _Credit_ (only if `spikes/api-credit.md` says `go`). A second budget-source kind next to the percentage windows: a dollar balance with a refresh date, configured per API-key provider instance under `overlay.budgets` (balance, cycle day) and decremented by the ledger's priced turns for that instance. The pressure rule in 03 gains one branch: green while projected spend to the refresh date fits the balance, yellow when it does not, red at zero, and that band never sets the subscription instance's band. `pressure.test.ts` gets the three rows.
+10. Nightly digest, independent of the spike result. `.github/workflows/overlay-digest.yml` on a cron: a script collects the day's new handoffs, merged PRs, `decisions.md` lines and any open sync PR, submits one Message Batches request on Haiku 5.5 with the key in the repo secret `OVERLAY_API_KEY`, and on the next run appends the result to `docs/overlay/digest.md` on a PR. Batch is server-side, so the PC being asleep does not matter. Secrets and the cron are developer actions.
 
 Tests: `costs.test.ts`, `CostLedger.test.ts` (replay idempotency, rebuild equality), `pressure.test.ts`.
 Exit: open any thread tree and see API-equivalent cost per child; providers show bands that match the Limits tab; rebuild produces identical totals.
@@ -64,6 +67,7 @@ Steps
 7. Hook 4: add the delegation-policy instruction section (05) but keep the "omit target.model" line out until Phase 3.
 8. Outcome capture (moved here from Phase 6 so the Phase 3 gate has evidence): attach verify pass/fail, review finding counts, merge result and final cost to each decision.
 9. Promoted ideas for this phase (table at the end), one PR each.
+10. _Credit_ (only if `go`). `evals/routing`, the shadow report's repricing and the optional complexity classifier run on the `Claude Credit` instance on Haiku 5.5, so the 200-decision gate for Phase 3 accumulates without touching the subscription windows.
 
 Exit: every `delegate_task`, `create_threads`, launch and scheduled launch writes a decision; the shadow report page renders; `evals/routing` deterministic cases pass in CI.
 Gate for Phase 3 (checked by its design-round prompt): the decision log holds at least 14 days **and** 200 decisions with every role represented; `decisions.md` holds a developer-signed "shadow report reviewed, matrix tuned" line (the shadow report reprices the requested model's actual tokens at the alternative's rates and is labelled an estimate, not measured cost per completed task); and the canary passed: 20 delegations, approved by the developer, executed on the router's choice with real runs, compared with their shadow prediction on cost per completed task and retry rate, passing when the cheap tier's retry rate is at most 1.5× the standard tier's and no quality-floor violation occurred.
@@ -81,6 +85,7 @@ Steps
 7. `Settings → Budgets` page.
 
 8. Promoted ideas for this phase (table at the end), one PR each.
+9. _Credit_ (only if `go`). The cheap tier resolves to the `Claude Credit` instance while its dollar band is green, then OpenCode, then the subscription. Read-only roles (verify, review) may resolve to Sonnet 5.5 on the credit instance while green; writers never do. `decide` tests cover the three resolutions and the green-to-yellow fallback.
 
 Tests: `BudgetGuard.test.ts`, `RoutingService.test.ts` (enforce vs shadow, pins, floors), adapter tests for env injection (extend existing `ClaudeAdapterV2.test.ts` / `CodexAdapterV2.test.ts` rows), one `mcp-tool-use` eval case per new instruction line (repo rule: eval cases for instruction changes).
 
@@ -90,9 +95,9 @@ Exit: with Claude forced to red in a test environment, new delegates land on che
 
 Steps
 
-1. `packages/routing/src/pipelines.ts`: templates (`feature`, `bugfix`, `research`, `sweep`, `best-of-n`) and role briefs; `.t3/roles/*.md` override loader (server, project-scoped); a persisted `pipeline_runs` record (root thread, template, current step, base SHA, candidate SHA, worktree path, approvals, attempts per step) updated by the templates through a small MCP tool. It is a record the invariants are checked against, not a workflow engine.
+1. `packages/routing/src/pipelines.ts`: templates (`feature`, `bugfix`, `research`, `design`, `sweep`, `best-of-n`) and role briefs; `.t3/roles/*.md` override loader (server, project-scoped); a persisted `pipeline_runs` record (root thread, template, current step, base SHA, candidate SHA, worktree path, approvals, attempts per step) updated by the templates through a small MCP tool. It is a record the invariants are checked against, not a workflow engine.
 2. Role defaults applied in `decide` (tier, effort, runtime ceiling) and brief injected into the child's first message (extend the existing role-instruction path in `delegateTask`).
-3. `/pipeline <name>` composer command + palette entry: expands the template into the root prompt. MCP `pipeline_start` tool that does the same for agents. Webhook recipe: GitHub label → scheduled-task webhook → `t3_thread_launch` with the template (docs only; the plumbing exists).
+3. `/pipeline <template> <request>` composer command + palette entry: expands the template into the root prompt with the request (or the body of a referenced `#issue`) as the first brief; argument rules in 05 "Pipeline templates". MCP `pipeline_start` tool that does the same for agents. Webhook recipe: GitHub label → scheduled-task webhook → `t3_thread_launch` with the template (docs only; the plumbing exists).
 4. `Witness.ts`: stall detection, parent notification via the delegated-question path, amber badge, optional cancel; settings `overlay.witness: { stallMinutes, onStall }` with decoding defaults.
 5. Server caps, each separate: `maxConcurrentChildrenPerRoot`, `maxChildrenLifetimePerRoot`, `maxAttemptsPerStep`, `maxDepth`, the global `overlay.limits.maxConcurrentChildren`, `maxTurnsPerChild` where the provider supports it, and `maxElapsedMinutesPerChild` with interrupt.
 6. `MergeQueue.ts`: serialised lane (rebase → test → `merge-tree` → merge/PR), bounce on conflict; MCP `merge_queue_enqueue`; reactor on `subagent_result`.

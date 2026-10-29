@@ -28,7 +28,7 @@ Exit criteria from `docs/overlay/07-roadmap.md` Phase 0. A line without a comman
 ## Promoted ideas
 
 - [x] #17 per-project policy — `overlay` is in `PROJECT_SCOPED_SERVER_SETTING_KEYS` and `ProjectSettingsOverrides` (narrowed to `routing`, `budgets`, `cockpit`) and `resolveProjectSettings` deep-merges it — proof: the two settings test commands above
-- [ ] #26 `textGenerationModelSelection` set to Haiku 5.5 — a setting in the developer's own `settings.json`, no code. `~/.t3/userdata` does not exist on this WSL2 machine, so I could not check it and did not write to it. The developer sets it (Settings, text generation model) and records the result here.
+- [x] #26 `textGenerationModelSelection` set to Haiku 5.5 (done by the developer 2026-10-29 on the `Claude Credit` instance, Low effort; decisions.md 15) — a setting in the developer's own `settings.json`, no code. `~/.t3/userdata` does not exist on this WSL2 machine, so I could not check it and did not write to it. The developer sets it (Settings, text generation model) and records the result here.
 
 ## Not done / deferred
 
