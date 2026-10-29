@@ -41,8 +41,11 @@ branch `overlay/phase-0-step-1` · worktree `/home/verox/src/t3code-phase-0` · 
 ## Open questions for the developer
 
 - Branch protection for `overlay/main` (Settings -> Branches -> add rule, or rerun the API call with permission): branch name pattern `overlay/main`; "Require a pull request before merging" on, approvals 0 for a solo repo; "Allow force pushes" off; "Allow deletions" off; do **not** add required status checks until `overlay-check` reports (step 6). Should I rerun the `gh api` call if you allow it?
+  Answer: Set by the developer, with the rules also applied to admins. Do not rerun the call.
 - Enable auto-merge on the fork (Settings -> General -> "Allow auto-merge") so passing sync PRs land without a click? Without a required check on `overlay/main` auto-merge would merge immediately, so it only makes sense after step 6.
+  Answer: No. Sync PRs are merged by hand after reading the sync handoff.
 - Is `OVERLAY_SYNC_TOKEN` (fine-grained PAT: contents, pull requests, issues write) already set as a repo secret?
+  Answer: Yes, set on 2026-10-29.
 
 ## Next
 
