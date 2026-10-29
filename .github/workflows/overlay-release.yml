@@ -1,0 +1,124 @@
+# Builds the unsigned Windows installer for this fork and prepares a DRAFT release.
+# Publishing the draft (one click) is what makes an installed app with updates switched on
+# see the new version. Sync and keepalive live in overlay-sync.yml; there is no schedule here.
+#
+# Tag push: version = the tag without "overlay-v". Manual: type the version to build.
+name: Overlay release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Installer version, for example 0.1.3-overlay.1 (tag overlay-v<version>)"
+        type: string
+        required: true
+  push:
+    tags:
+      - "overlay-v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: overlay-release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - name: Resolve and validate
+        id: resolve
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          REF_NAME: ${{ github.ref_name }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = "push" ]; then
+            version="${REF_NAME#overlay-v}"
+          else
+            version="$INPUT_VERSION"
+          fi
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::'$version' is not a semver version"; exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build Windows installer
+    needs: version
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: package.json
+          cache: false
+          run-install: false
+
+      - name: Install
+        run: vp install
+
+      - name: Type check web
+        run: vp run --filter @t3tools/web typecheck
+
+      - name: Build installer
+        env:
+          T3CODE_DESKTOP_UPDATE_REPOSITORY: ${{ github.repository }}
+        run: >
+          vp run dist:desktop:win:x64
+          --output-dir "$RUNNER_TEMP/out"
+          --build-version "${{ needs.version.outputs.version }}"
+          --verbose
+
+      - name: Check the usage strip is in the packaged web app
+        run: grep -rlq 'data-usage-strip' apps/web/dist
+
+      - name: Check the update feed carries this version
+        run: |
+          grep -q "version: ${{ needs.version.outputs.version }}" "$RUNNER_TEMP/out/latest.yml"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ needs.version.outputs.version }}
+          path: |
+            ${{ runner.temp }}/out/T3-Code-*.exe
+            ${{ runner.temp }}/out/T3-Code-*.exe.blockmap
+            ${{ runner.temp }}/out/latest.yml
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Draft release
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: installer-${{ needs.version.outputs.version }}
+          path: out
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          gh release create "overlay-v$VERSION" out/* \
+            --repo "$GITHUB_REPOSITORY" --draft --target "$GITHUB_SHA" \
+            --title "$VERSION (unofficial fork build)" \
+            --notes "Unofficial, unsigned build of the VeroxAUS T3 Code fork at ${GITHUB_SHA:0:10}. Not affiliated with or endorsed by T3 Tools. Windows x64 only; no WSL runtime. Built by the Overlay release workflow."
