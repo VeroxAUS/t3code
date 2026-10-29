@@ -1,6 +1,6 @@
 # Handoff · Phase 0 · Step 0 · 2026-10-29 · written by Claude Sonnet 5.5 / Medium
 
-commit: PENDING
+commit: ce05eca76151be2c30893b6c1fae1b44bc92afc4
 supersedes: none
 
 ## Where we are
