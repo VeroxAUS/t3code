@@ -16,7 +16,12 @@ Every upstream file the overlay has changed, one line each: path, reason, and wh
 - `apps/desktop/src/updates/updatesTestHarness.ts` — existing cases opt back in with `T3CODE_DISABLE_AUTO_UPDATE=false`. Marker: yes
 - `apps/server/src/cloud/selfUpdate.ts` — refuse server self-update from the default (upstream) release feed. Marker: yes
 - `apps/server/src/cloud/selfUpdate.test.ts` — harness points at a fork feed by default; test for the guard. Marker: yes
-- `apps/server/src/telemetry/AnalyticsService.ts` — `T3CODE_TELEMETRY_ENABLED` defaults to false in overlay builds. Marker: yes
-- `apps/server/src/telemetry/AnalyticsService.test.ts` — test that no event is sent under the overlay default. Marker: yes
+- `apps/server/src/telemetry/AnalyticsService.ts` — `T3CODE_TELEMETRY_ENABLED` outranks `overlay.telemetry.optIn`, which defaults to false. Marker: yes
+- `apps/server/src/telemetry/AnalyticsService.test.ts` — tests for the opt-in default, opt-in, and the env override. Marker: yes
 - `package.json` — `knip:check` lists `--workspace packages/routing`. Marker: no (JSON)
 - `pnpm-lock.yaml` — lockfile entry for the new `@t3tools/routing` workspace. Marker: no (lockfile)
+- `packages/contracts/src/settings.ts` — `overlay` key on `ServerSettings`, `ServerSettingsPatch`, `PROJECT_SCOPED_SERVER_SETTING_KEYS` and `ProjectSettingsOverrides`. Marker: yes
+- `packages/contracts/src/settings.test.ts` — overlay decoding defaults and patch round-trip. Marker: yes
+- `packages/shared/src/projectSettings.ts` — `resolveProjectSettings` deep-merges `overlay` instead of replacing it. Marker: yes
+- `packages/shared/src/projectSettings.test.ts` — nested overlay override keeps the other keys. Marker: yes
+- `apps/server/src/server.ts` — `AnalyticsService.layer` is provided the settings layer. Marker: yes

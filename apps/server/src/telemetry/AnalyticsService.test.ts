@@ -17,6 +17,7 @@ import * as HttpServerResponse from "effect/http/HttpServerResponse";
 import * as HostProcess from "@t3tools/shared/HostProcess";
 
 import * as ServerConfig from "../config.ts";
+import * as ServerSettings from "../serverSettings.ts"; // overlay
 import { getTelemetryIdentity } from "./Identify.ts";
 import * as AnalyticsService from "./AnalyticsService.ts";
 
@@ -134,6 +135,7 @@ const sendFor = (
       }),
     );
     const runtimeLayer = AnalyticsService.layer.pipe(
+      Layer.provide(ServerSettings.layerTest()), // overlay
       Layer.provideMerge(
         ServerConfig.ServerConfig.layerTest(process.cwd(), { prefix: "t3-telemetry-retry-" }),
       ),
@@ -228,7 +230,10 @@ it.layer(NodeServices.layer)("AnalyticsService test", (it) => {
         prefix: "t3-telemetry-base-",
       });
 
-      const layerTelemetry = AnalyticsService.layer.pipe(Layer.provideMerge(layerServerConfig));
+      const layerTelemetry = AnalyticsService.layer.pipe(
+        Layer.provide(ServerSettings.layerTest()), // overlay
+        Layer.provideMerge(layerServerConfig),
+      );
       const layerConfig = ConfigProvider.layer(
         ConfigProvider.fromUnknown({
           T3CODE_TELEMETRY_ENABLED: true,
@@ -329,7 +334,10 @@ it.layer(NodeServices.layer)("AnalyticsService test", (it) => {
       const layerServerConfig = ServerConfig.ServerConfig.layerTest(process.cwd(), {
         prefix: "t3-telemetry-disabled-",
       });
-      const layerTelemetry = AnalyticsService.layer.pipe(Layer.provideMerge(layerServerConfig));
+      const layerTelemetry = AnalyticsService.layer.pipe(
+        Layer.provide(ServerSettings.layerTest()), // overlay
+        Layer.provideMerge(layerServerConfig),
+      );
       const layerConfig = ConfigProvider.layer(
         ConfigProvider.fromUnknown({
           T3CODE_TELEMETRY_ENABLED: false,
@@ -366,11 +374,15 @@ it.layer(NodeServices.layer)("AnalyticsService test", (it) => {
     }),
   );
 
-  // overlay: telemetry is off unless T3CODE_TELEMETRY_ENABLED=true
-  it.effect("does not send batch requests under the overlay default", () =>
+  // overlay: telemetry follows overlay.telemetry.optIn unless T3CODE_TELEMETRY_ENABLED is set
+  const capturedBatchPathsFor = (input: {
+    readonly optIn: boolean;
+    readonly env?: Readonly<Record<string, unknown>>;
+  }) =>
     Effect.gen(function* () {
       const capturedPaths: Array<string> = [];
       const layerTelemetry = AnalyticsService.layer.pipe(
+        Layer.provide(ServerSettings.layerTest({ overlay: { telemetry: { optIn: input.optIn } } })),
         Layer.provideMerge(
           ServerConfig.ServerConfig.layerTest(process.cwd(), { prefix: "t3-telemetry-overlay-" }),
         ),
@@ -379,6 +391,7 @@ it.layer(NodeServices.layer)("AnalyticsService test", (it) => {
         ConfigProvider.fromUnknown({
           T3CODE_POSTHOG_KEY: "phc_test_key",
           T3CODE_POSTHOG_HOST: "http://localhost",
+          ...input.env,
         }),
       );
       const layerBatchServer = HttpServer.serve(
@@ -402,11 +415,32 @@ it.layer(NodeServices.layer)("AnalyticsService test", (it) => {
       yield* Effect.gen(function* () {
         yield* Layer.launch(layerBatchServer).pipe(Effect.forkScoped);
         const analytics = yield* AnalyticsService.AnalyticsService;
-        yield* analytics.record("test.overlay-default", { index: 1 });
+        yield* analytics.record("test.overlay", { index: 1 });
         yield* analytics.flush;
       }).pipe(Effect.provide(layerRuntime));
 
-      assert.deepEqual(capturedPaths, []);
+      return capturedPaths;
+    });
+
+  it.effect("does not send batch requests under the overlay default", () =>
+    Effect.gen(function* () {
+      assert.deepEqual(yield* capturedBatchPathsFor({ optIn: false }), []);
+    }),
+  );
+
+  it.effect("sends batch requests once overlay.telemetry.optIn is true", () =>
+    Effect.gen(function* () {
+      assert.equal((yield* capturedBatchPathsFor({ optIn: true })).length, 1);
+    }),
+  );
+
+  it.effect("lets T3CODE_TELEMETRY_ENABLED=false outrank overlay.telemetry.optIn", () =>
+    Effect.gen(function* () {
+      const paths = yield* capturedBatchPathsFor({
+        optIn: true,
+        env: { T3CODE_TELEMETRY_ENABLED: false },
+      });
+      assert.deepEqual(paths, []);
     }),
   );
 });
