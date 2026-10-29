@@ -1,6 +1,5 @@
 // T3 ingest retains events and forwards to PostHog; UUIDs deduplicate retries there.
 import * as HostProcess from "@t3tools/shared/HostProcess";
-import { OVERLAY_BUILD } from "@t3tools/shared/overlayBuild"; // overlay: telemetry default
 import type { ClientOs } from "@t3tools/contracts";
 import * as Clock from "effect/Clock";
 import * as Config from "effect/Config";
@@ -21,6 +20,7 @@ import * as HttpClientResponse from "effect/http/HttpClientResponse";
 
 import packageJson from "../../package.json" with { type: "json" };
 import * as ServerConfig from "../config.ts";
+import { ServerSettingsService } from "../serverSettings.ts"; // overlay: overlay.telemetry.optIn
 import { getTelemetryIdentity, type TelemetryOwner } from "./Identify.ts";
 
 interface BufferedAnalyticsEvent {
@@ -68,9 +68,8 @@ const TelemetryEnvConfig = Config.all({
   posthogHost: Config.String("T3CODE_POSTHOG_HOST").pipe(
     Config.withDefault("https://ingest.t3.codes"),
   ),
-  enabled: Config.Boolean("T3CODE_TELEMETRY_ENABLED").pipe(
-    Config.withDefault(!OVERLAY_BUILD), // overlay: off by default; step 4 wires overlay.telemetry.optIn
-  ),
+  // overlay: an explicit env value outranks the overlay.telemetry.optIn setting, which defaults to off.
+  enabledOverride: Config.Boolean("T3CODE_TELEMETRY_ENABLED").pipe(Config.option),
   flushBatchSize: Config.Number("T3CODE_TELEMETRY_FLUSH_BATCH_SIZE").pipe(Config.withDefault(20)),
   maxBufferedEvents: Config.Number("T3CODE_TELEMETRY_MAX_BUFFERED_EVENTS").pipe(
     Config.withDefault(1_000),
@@ -134,6 +133,7 @@ export const make = Effect.gen(function* () {
   const telemetryConfig = yield* TelemetryEnvConfig;
   const httpClient = yield* HttpClient.HttpClient;
   const serverConfig = yield* ServerConfig.ServerConfig;
+  const serverSettings = yield* ServerSettingsService; // overlay
   const { distinctId, installId } = yield* getTelemetryIdentity;
   const crypto = yield* Crypto.Crypto;
   const bufferRef = yield* Ref.make<ReadonlyArray<BufferedAnalyticsEvent>>([]);
@@ -152,6 +152,16 @@ export const make = Effect.gen(function* () {
   const clientType = serverConfig.mode === "desktop" ? "desktop-app" : "cli-web-client";
   const hostPlatform = yield* HostProcess.Platform;
   const hostArchitecture = yield* HostProcess.Architecture;
+
+  // overlay: unreadable settings fail closed.
+  const isEnabled = Option.match(telemetryConfig.enabledOverride, {
+    onSome: Effect.succeed,
+    onNone: () =>
+      serverSettings.getSettings.pipe(
+        Effect.map((settings) => settings.overlay.telemetry.optIn),
+        Effect.orElseSucceed(() => false),
+      ),
+  });
 
   const enqueueBufferedEvent = (
     uuid: string,
@@ -188,7 +198,7 @@ export const make = Effect.gen(function* () {
   const sendBatch = Effect.fn("AnalyticsService.sendBatch")(function* (
     events: ReadonlyArray<BufferedAnalyticsEvent>,
   ) {
-    if (!telemetryConfig.enabled || !distinctId) return;
+    if (!distinctId || !(yield* isEnabled)) return; // overlay
 
     const payload = {
       api_key: telemetryConfig.posthogKey,
@@ -300,7 +310,7 @@ export const make = Effect.gen(function* () {
 
   const record: AnalyticsService["Service"]["record"] = Effect.fn("AnalyticsService.record")(
     function* (event, properties) {
-      if (!telemetryConfig.enabled || !distinctId) return;
+      if (!distinctId || !(yield* isEnabled)) return; // overlay
 
       // Catch Node UUID defects too; best-effort telemetry drops events without UUIDs.
       const uuid = yield* Effect.exit(crypto.randomUUIDv7());

@@ -15,6 +15,7 @@ import {
 } from "@t3tools/contracts";
 import { normalizeProjectPathForComparison } from "./path.ts";
 import { fallbackTextGenerationModelSelection } from "./serverSettings.ts";
+import { deepMerge } from "./Struct.ts"; // overlay: nested overlay overrides
 
 export type ProjectSettingSource = "environment" | "project" | "t3.json";
 
@@ -147,7 +148,11 @@ function resolveProjectOverrides(
     ) {
       continue;
     }
-    effective[key] = value;
+    // overlay: a nested override must keep the sibling groups and fields it does not name.
+    effective[key] =
+      key === "overlay"
+        ? deepMerge(settings.overlay, value as ProjectSettingsOverrides["overlay"] & object)
+        : value;
     sources[key] = "project";
   }
   const textGeneration = effective.textGenerationModelSelection as ModelSelection;

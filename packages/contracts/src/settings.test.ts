@@ -27,6 +27,55 @@ const decodeServerSettingsPatch = Schema.decodeUnknownSync(ServerSettingsPatch);
 const encodeServerSettings = Schema.encodeSync(ServerSettings);
 const decodeClaudeSettings = Schema.decodeUnknownSync(ClaudeSettings);
 
+// overlay: overlay settings
+describe("overlay settings", () => {
+  const overlayDefaults = {
+    routing: { enabled: false, mode: "off" },
+    budgets: {
+      perRootThreadUsd: 5,
+      perChildUsd: 1.5,
+      maxConcurrentChildrenPerRoot: 3,
+      maxChildrenLifetimePerRoot: 12,
+      maxAttemptsPerStep: 2,
+      maxDepth: 2,
+      maxElapsedMinutesPerChild: 60,
+      onExceed: "block_new_children",
+    },
+    limits: { maxConcurrentChildren: 6 },
+    cockpit: { teamView: false },
+    telemetry: { optIn: false },
+  };
+
+  it.each([
+    ["an old settings file without overlay", {}],
+    ["an empty overlay", { overlay: {} }],
+    ["empty overlay groups", { overlay: { routing: {}, budgets: {}, telemetry: {} } }],
+  ])("decodes %s to the defaults", (_name, input) => {
+    expect(decodeServerSettings(input).overlay).toEqual(overlayDefaults);
+  });
+
+  it("keeps stored fields and defaults the rest of their group", () => {
+    expect(
+      decodeServerSettings({
+        overlay: { budgets: { perChildUsd: 2 }, routing: { mode: "shadow" } },
+      }).overlay,
+    ).toEqual({
+      ...overlayDefaults,
+      routing: { enabled: false, mode: "shadow" },
+      budgets: { ...overlayDefaults.budgets, perChildUsd: 2 },
+    });
+  });
+
+  it("round-trips a routing mode patch and rejects unknown values", () => {
+    const patch = { overlay: { routing: { mode: "enforce" } } };
+    expect(decodeServerSettingsPatch(patch)).toEqual(patch);
+    expect(() => decodeServerSettingsPatch({ overlay: { routing: { mode: "auto" } } })).toThrow();
+    expect(() =>
+      decodeServerSettingsPatch({ overlay: { budgets: { onExceed: "ignore" } } }),
+    ).toThrow();
+  });
+});
+
 describe("storage cleanup settings", () => {
   it("keeps cleanup disabled for existing installations", () => {
     expect(decodeServerSettings({}).worktreeCleanup).toBeNull();

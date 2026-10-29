@@ -952,6 +952,97 @@ export const WorktreeCleanup = Schema.NullOr(
 );
 export type WorktreeCleanup = typeof WorktreeCleanup.Type;
 
+// overlay: multi-agent harness settings; the fuller routing fields arrive in Phase 2.
+export const OverlayRoutingMode = Schema.Literals(["off", "shadow", "enforce"]);
+export type OverlayRoutingMode = typeof OverlayRoutingMode.Type;
+
+export const OverlayBudgetOnExceed = Schema.Literals(["warn", "block_new_children", "stop"]);
+export type OverlayBudgetOnExceed = typeof OverlayBudgetOnExceed.Type;
+
+const OverlayNonNegativeNumber = Schema.Number.check(Schema.isGreaterThanOrEqualTo(0));
+const OverlayPositiveInt = Schema.Int.check(Schema.isGreaterThanOrEqualTo(1));
+
+export const OverlayRoutingSettings = Schema.Struct({
+  enabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
+  mode: OverlayRoutingMode.pipe(Schema.withDecodingDefault(Effect.succeed("off" as const))),
+});
+export const OverlayBudgetsSettings = Schema.Struct({
+  perRootThreadUsd: OverlayNonNegativeNumber.pipe(Schema.withDecodingDefault(Effect.succeed(5))),
+  perChildUsd: OverlayNonNegativeNumber.pipe(Schema.withDecodingDefault(Effect.succeed(1.5))),
+  maxConcurrentChildrenPerRoot: OverlayPositiveInt.pipe(
+    Schema.withDecodingDefault(Effect.succeed(3)),
+  ),
+  maxChildrenLifetimePerRoot: OverlayPositiveInt.pipe(
+    Schema.withDecodingDefault(Effect.succeed(12)),
+  ),
+  maxAttemptsPerStep: OverlayPositiveInt.pipe(Schema.withDecodingDefault(Effect.succeed(2))),
+  maxDepth: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)).pipe(
+    Schema.withDecodingDefault(Effect.succeed(2)),
+  ),
+  maxElapsedMinutesPerChild: OverlayPositiveInt.pipe(
+    Schema.withDecodingDefault(Effect.succeed(60)),
+  ),
+  onExceed: OverlayBudgetOnExceed.pipe(
+    Schema.withDecodingDefault(Effect.succeed("block_new_children" as const)),
+  ),
+});
+export const OverlayLimitsSettings = Schema.Struct({
+  maxConcurrentChildren: OverlayPositiveInt.pipe(Schema.withDecodingDefault(Effect.succeed(6))),
+});
+export const OverlayCockpitSettings = Schema.Struct({
+  teamView: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
+});
+export const OverlayTelemetrySettings = Schema.Struct({
+  optIn: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
+});
+
+export const OverlaySettings = Schema.Struct({
+  routing: OverlayRoutingSettings.pipe(
+    Schema.withDecodingDefault(Effect.succeed(Schema.decodeSync(OverlayRoutingSettings)({}))),
+  ),
+  budgets: OverlayBudgetsSettings.pipe(
+    Schema.withDecodingDefault(Effect.succeed(Schema.decodeSync(OverlayBudgetsSettings)({}))),
+  ),
+  limits: OverlayLimitsSettings.pipe(
+    Schema.withDecodingDefault(Effect.succeed(Schema.decodeSync(OverlayLimitsSettings)({}))),
+  ),
+  cockpit: OverlayCockpitSettings.pipe(
+    Schema.withDecodingDefault(Effect.succeed(Schema.decodeSync(OverlayCockpitSettings)({}))),
+  ),
+  telemetry: OverlayTelemetrySettings.pipe(
+    Schema.withDecodingDefault(Effect.succeed(Schema.decodeSync(OverlayTelemetrySettings)({}))),
+  ),
+});
+export type OverlaySettings = typeof OverlaySettings.Type;
+
+/** Every group and field is optional, so a patch or project override names only what it changes. */
+export const OverlaySettingsPatch = Schema.Struct({
+  routing: Schema.optionalKey(
+    Schema.Struct({
+      enabled: Schema.optionalKey(Schema.Boolean),
+      mode: Schema.optionalKey(OverlayRoutingMode),
+    }),
+  ),
+  budgets: Schema.optionalKey(
+    Schema.Struct({
+      perRootThreadUsd: Schema.optionalKey(OverlayNonNegativeNumber),
+      perChildUsd: Schema.optionalKey(OverlayNonNegativeNumber),
+      maxConcurrentChildrenPerRoot: Schema.optionalKey(OverlayPositiveInt),
+      maxChildrenLifetimePerRoot: Schema.optionalKey(OverlayPositiveInt),
+      maxAttemptsPerStep: Schema.optionalKey(OverlayPositiveInt),
+      maxDepth: Schema.optionalKey(Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))),
+      maxElapsedMinutesPerChild: Schema.optionalKey(OverlayPositiveInt),
+      onExceed: Schema.optionalKey(OverlayBudgetOnExceed),
+    }),
+  ),
+  limits: Schema.optionalKey(
+    Schema.Struct({ maxConcurrentChildren: Schema.optionalKey(OverlayPositiveInt) }),
+  ),
+  cockpit: Schema.optionalKey(Schema.Struct({ teamView: Schema.optionalKey(Schema.Boolean) })),
+  telemetry: Schema.optionalKey(Schema.Struct({ optIn: Schema.optionalKey(Schema.Boolean) })),
+});
+export type OverlaySettingsPatch = typeof OverlaySettingsPatch.Type;
+
 export const PROJECT_SCOPED_SERVER_SETTING_KEYS = [
   "worktreeCleanup",
   "defaultModelSelection",
@@ -979,6 +1070,7 @@ export const PROJECT_SCOPED_SERVER_SETTING_KEYS = [
   "sidebarAutoSettleKeepPullRequests",
   "continueThreadsAfterServerUpdate",
   "responseStreamingMode",
+  "overlay", // overlay: project-scoped
 ] as const;
 export type ProjectScopedServerSettingKey = (typeof PROJECT_SCOPED_SERVER_SETTING_KEYS)[number];
 
@@ -988,7 +1080,7 @@ export const ProjectProviderInstanceOverride = Schema.Struct({
 export type ProjectProviderInstanceOverride = typeof ProjectProviderInstanceOverride.Type;
 
 /** Absent keys inherit; null is a value for nullable settings.
- * providerInstances overrides fields per instance; other keys replace the whole setting. */
+ * providerInstances overrides fields per instance, and overlay per field (overlay); other keys replace the whole setting. */
 export const ProjectSettingsOverrides = Schema.Struct({
   worktreeCleanup: Schema.optionalKey(WorktreeCleanup),
   defaultModelSelection: Schema.optionalKey(Schema.NullOr(ModelSelection)),
@@ -1016,6 +1108,7 @@ export const ProjectSettingsOverrides = Schema.Struct({
   sidebarAutoSettleKeepPullRequests: Schema.optionalKey(Schema.Boolean),
   continueThreadsAfterServerUpdate: Schema.optionalKey(Schema.Boolean),
   responseStreamingMode: Schema.optionalKey(ResponseStreamingMode),
+  overlay: Schema.optionalKey(OverlaySettingsPatch), // overlay: merged per field by resolveProjectSettings
   providerInstances: Schema.optionalKey(
     Schema.Record(ProviderInstanceId, ProjectProviderInstanceOverride),
   ),
@@ -1118,6 +1211,10 @@ export const ServerSettings = Schema.Struct({
   ),
   responseStreamingMode: ResponseStreamingMode.pipe(
     Schema.withDecodingDefault(Effect.succeed("paragraph" as const)),
+  ),
+  overlay: OverlaySettings.pipe(
+    // overlay: multi-agent harness settings
+    Schema.withDecodingDefault(Effect.succeed(Schema.decodeSync(OverlaySettings)({}))),
   ),
   enableProviderUpdateChecks: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(true))),
   continueThreadsAfterServerUpdate: Schema.Boolean.pipe(
@@ -1472,6 +1569,7 @@ export const ServerSettingsPatch = Schema.Struct({
   ),
   worktreesDirectory: Schema.optionalKey(TrimmedString),
   responseStreamingMode: Schema.optionalKey(ResponseStreamingMode),
+  overlay: Schema.optionalKey(OverlaySettingsPatch), // overlay: deep-merged by applyServerSettingsPatch
   enableProviderUpdateChecks: Schema.optionalKey(Schema.Boolean),
   continueThreadsAfterServerUpdate: Schema.optionalKey(Schema.Boolean),
   enableAgentBrowserAccess: Schema.optionalKey(Schema.Boolean),

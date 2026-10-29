@@ -52,6 +52,32 @@ describe("resolveProjectSettings", () => {
     ).toBe(false);
   });
 
+  // overlay: a nested override must not wipe the other overlay groups
+  it("merges an overlay override into the global overlay settings", () => {
+    const settings = applyServerSettingsPatch(DEFAULT_SERVER_SETTINGS, {
+      overlay: { budgets: { perRootThreadUsd: 8 }, cockpit: { teamView: true } },
+      projectSettingsOverrides: {
+        [projectId]: { overlay: { routing: { mode: "shadow" }, budgets: { perChildUsd: 0.5 } } },
+      },
+    });
+    const resolved = resolveProjectSettings(settings, projectId);
+    expect(resolved.settings.overlay).toEqual({
+      ...DEFAULT_SERVER_SETTINGS.overlay,
+      routing: { enabled: false, mode: "shadow" },
+      budgets: {
+        ...DEFAULT_SERVER_SETTINGS.overlay.budgets,
+        perRootThreadUsd: 8,
+        perChildUsd: 0.5,
+      },
+      cockpit: { teamView: true },
+    });
+    expect(resolved.sources.overlay).toBe("project");
+    expect(resolveProjectSettings(settings, otherProjectId).settings.overlay).toEqual(
+      settings.overlay,
+    );
+    expect(settings.overlay.budgets.perChildUsd).toBe(1.5);
+  });
+
   it("applies overrides per key and reports their source", () => {
     const settings = applyServerSettingsPatch(DEFAULT_SERVER_SETTINGS, {
       defaultAutoPull: true,
