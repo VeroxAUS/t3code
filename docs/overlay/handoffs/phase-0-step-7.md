@@ -1,6 +1,6 @@
 # Handoff · Phase 0 · Step 7 · 2026-10-29 · written by Claude Sonnet 5.5 / Medium
 
-commit: 7e35bc315e0be199adb326cedcbfd59ce1633b22
+commit: c0d8f4c8ee38e628cbde6ecdec44971bbd6c0809
 supersedes: docs/overlay/handoffs/phase-0-step-6.md
 status: n/a
 
