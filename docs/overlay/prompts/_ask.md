@@ -2,7 +2,7 @@
 
 Launch line: `Run DOCS/prompts/_ask.md` followed by the question in the same message. One topic per thread; when the topic changes, start a new one.
 
-Run on: Claude Opus 5.5, medium. Sonnet 5.5 for "where is this in the code" lookups.
+Run on: Claude Opus 5.5 medium · Codex GPT-6 Astra medium, whichever window is greener. Sonnet 5.5 · GPT-6.1 Sol for "where is this in the code" lookups.
 
 Read `_preamble.md` for paths and the test and tooling rules only. The gate, "Branch and PR" and "Finish" sections do not apply: this thread is not a link in the chain. No handoff, no branch, no PR.
 
