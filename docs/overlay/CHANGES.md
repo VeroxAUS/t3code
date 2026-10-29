@@ -1,6 +1,6 @@
 # Overlay change manifest
 
-Every upstream file the overlay has changed, one line each: path, reason, and whether it carries a `// overlay:` marker. `scripts/overlay-check.ts` (step 6) fails a PR whose changed upstream paths and this list disagree. Files under the overlay-owned paths (see `prompts/_preamble.md`) need no line.
+Every upstream file the overlay has changed, one line each: path, reason, and whether it carries a `// overlay:` marker. `scripts/overlay-check.ts` fails a PR whose changed upstream paths and this list disagree. Files under the overlay-owned paths (see `prompts/_preamble.md`) need no line.
 
 ## Test command
 
@@ -27,3 +27,4 @@ Every upstream file the overlay has changed, one line each: path, reason, and wh
 - `packages/shared/src/projectSettings.ts` — `resolveProjectSettings` deep-merges `overlay` instead of replacing it. Marker: yes
 - `packages/shared/src/projectSettings.test.ts` — nested overlay override keeps the other keys. Marker: yes
 - `apps/server/src/server.ts` — `AnalyticsService.layer` is provided the settings layer. Marker: yes
+- `knip.jsonc` — `scripts.entry` lists `overlay-check.ts`, which only the overlay workflows run. Marker: yes

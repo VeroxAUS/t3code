@@ -166,11 +166,7 @@ jobs:
         if: steps.tag.outputs.tag != ''
         run: vp run check:changed
 
-      - name: Test routing package
+      # Also runs the routing tests. After the handoff step, so the handoff rule sees it.
+      - name: Overlay check
         if: steps.tag.outputs.tag != ''
-        run: |
-          if [ -d packages/routing ]; then
-            vp test run packages/routing
-          else
-            echo "packages/routing does not exist yet; skipping."
-          fi
+        run: node scripts/overlay-check.ts --base origin/overlay/main
