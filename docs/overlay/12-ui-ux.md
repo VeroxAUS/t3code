@@ -37,7 +37,7 @@ The mockup in `mockups/team-view.html` shows the board area at the narrow width 
 - **Cards**: provider glyph + model name, role badge, status pill (existing `resolveThreadStatusPill`), elapsed, progress line, cost in tabular numerals, a 2px budget bar as the card's bottom edge.
 - **Attention states**: needs-you = primary-coloured left border and an inbox entry; stalled = warning ring pulsing on opacity only (T3's GPU rule); over budget = destructive bar; offline environment = dimmed with a reconnect affordance.
 - **Motion**: 120–150 ms opacity and transform only; respects `prefers-reduced-motion`.
-- **Numbers**: cost shown as "API-equiv" with one tooltip explaining it is not the bill; windows shown as "% used · resets Fri 09:00".
+- **Numbers**: cost shown in the display currency (AUD, `A$`) as "API-equiv" with one tooltip explaining it is not the bill and names the fixed USD rate; windows shown as "% used · resets Fri 09:00".
 
 ## Interactions
 

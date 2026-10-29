@@ -31,6 +31,7 @@ Everything downstream (router, budgets, team view) needs two signals that T3 doe
 5. **Completeness.** `turnTokenUsage.usageStatus` partial or unavailable → `complete: false`; the row is excluded from budget reconciliation until complete. Claude reports native subagent tokens inside the main turn (`hasSubagents`) → `includesNativeSubagents: true`; Codex reports per thread. Never estimate from transcript text.
 6. **Rollups** by `rootThreadId` (`OrchestrationV2AppThreadLineage.rootThreadId`) are computed by query, not stored.
 7. RPC `routing.getThreadCosts({ threadIds | rootThreadId, environmentId })` → rows plus a rollup `{ usdEquivalent, priced, complete, tokens, byModel[] }`. Bounded to 500 rows per call.
+8. **Display currency.** Rates and rows are USD because the LiteLLM table is. Everything a person reads or types is in `overlay.ledger.display.currency` (default `AUD`) converted at `overlay.ledger.display.usdRate`, a fixed rate the developer sets and updates by hand (no FX lookup; decoding default 1.5). That covers cost chips, rollups, the shadow report, budget inputs and alerts, the credit balance band and the `budget_exceeded` sentence; each shows the currency code once (`A$4.20 API-equiv`). Tests and fixtures stay USD. The rollup carries both values so no caller converts twice.
 
 Tests (`CostLedger.test.ts`, drained effect worker, no sleeps): crash mid-turn then restart; duplicate delivery; late correction of a cumulative total; partial then complete usage; rate change then reprice; rebuild equals live.
 

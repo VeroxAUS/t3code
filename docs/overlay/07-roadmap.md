@@ -44,7 +44,7 @@ Steps
 3. RPC `routing.getThreadCosts` in `packages/contracts/src/rpc.ts` + handler in `ws.ts` (follow `server.getUsageSummary`).
 4. `packages/routing/src/pressure.ts` + table tests; `apps/server/src/routing/Pressure.ts` adapter with hysteresis state; push `pressure` on the `serverConfig` stream.
 5. Hook 3: `capabilities` appends `usage.band` per provider.
-6. UI: cost chip in `SidebarThreadRow.tsx` and `ThreadLineageWorkflowRow.tsx`; band dot in the model picker; mobile thread list chip.
+6. UI: cost chip (display currency, 03 rule 8; settings `overlay.ledger.display`) in `SidebarThreadRow.tsx` and `ThreadLineageWorkflowRow.tsx`; band dot in the model picker; mobile thread list chip.
 
 7. RPC `routing.rebuildLedger` (reset the cursor and replay from the persisted event log; live events queue behind the replay) and `routing.repriceLedger`, with tests for crash mid-turn, duplicate delivery, late correction, partial then complete usage, a rate change then reprice, and rebuild equals live.
 8. Promoted ideas for this phase (table at the end), one PR each.
