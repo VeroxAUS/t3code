@@ -34,6 +34,7 @@ supersedes: docs/overlay/handoffs/phase-0-fix-3.md
 ## Developer actions
 
 - Carry this open item into the Phase 0b design handoff. If not already done, run `gh workflow disable overlay-sync.yml --repo VeroxAUS/t3code`, then `gh workflow enable overlay-sync.yml --repo VeroxAUS/t3code`; record the result and inspect the next scheduled run with the run-list command above. Open the GitHub support ticket and record its reference. Until resolved, manually dispatch sync when upstream tags a release, per decision 16. This review changes no repository settings.
+  Result: disable/enable done 2026-10-30; support ticket #4927935; scheduled run pending.
 
 ## Open questions for the developer
 
