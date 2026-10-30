@@ -1,14 +1,15 @@
 # Handoff · Phase 0b · Step 1 · 2026-10-31 · written by Codex
 
-commit: b315a4f14f603ea066d726611d547e2465049043
+commit: 5eedcca698aa2de629c703fa549a7e4dddbaaf35
 supersedes: docs/overlay/handoffs/phase-0b-design.md
 
 ## Where we are
 
-Branch `overlay/phase-0b-step-1` · worktree `/home/verox/src/t3code-phase-0`. Step 1 investigation and pure arithmetic complete; Phase 0b is not complete. PR pending creation into `overlay/main`; never merge from this thread. The branch already contained ten developer commits after the design merge, touching README, inbox and the shadow-window playbook; preserved unchanged.
+Branch `overlay/phase-0b-step-1` · worktree `/home/verox/src/t3code-phase-0`. Step 1 investigation and pure arithmetic complete; Phase 0b is not complete. [PR #20](https://github.com/VeroxAUS/t3code/pull/20) into `overlay/main`, open; local checks pass, CI started at creation and remains unclaimed. Never merge from this thread. The branch already contained ten developer commits after the design merge, touching README, inbox and the shadow-window playbook; preserved unchanged.
 
 ## Done, verified
 
+- Pushed step branch and opened [PR #20](https://github.com/VeroxAUS/t3code/pull/20); not merged. Evidence: `gh pr view 20 --repo VeroxAUS/t3code --json url,state,statusCheckRollup` → OPEN, overlay-check in progress at creation.
 - Gate/base: `git fetch origin`, `git merge-base --is-ancestor origin/overlay/main HEAD`, `gh pr view 19 --repo VeroxAUS/t3code --json state,mergeCommit` → pass; design merged at `c906bc048a3d98f8866300b6797ee03b5e6a7971`. Spike baseline `014ad21ed446f53b12827ff72eb8b41a101adc05`.
 - Pure `packages/routing/src/costs.ts` and `costs.test.ts`: disjoint cache buckets, inclusive reasoning, latest cumulative snapshots/corrections, partial/unavailable/unknown rates, invalid counters and overflow. `cd packages/routing && ../../node_modules/.bin/vp test run src/costs.test.ts` → 22 pass. Test first failed for missing costs.ts; hand-computed USD vectors use explicitly synthetic pinned rates, including live and historical token counts. No T3 imports or live pricing.
 - Existing normalizers: `cd apps/server && ../../node_modules/.bin/vp test run src/provider/TurnTokenUsage.test.ts` → 5 pass. Source/fixture evidence for OpenCode 2 and shared ACP is labelled separately from live captures; no upstream adapter changed.
