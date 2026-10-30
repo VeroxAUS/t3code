@@ -5,10 +5,11 @@ supersedes: docs/overlay/handoffs/phase-0b-step-1.md
 
 ## Where we are
 
-Branch `overlay/phase-0b-step-2` · worktree `/home/verox/src/t3code-phase-0`. Replay-durability investigation complete; Phase 0b remains incomplete. Implementation commit above; this handoff is committed afterward. PR creation follows this handoff commit; CI is not yet claimed. Never merge from this thread.
+Branch `overlay/phase-0b-step-2` · worktree `/home/verox/src/t3code-phase-0`. Replay-durability investigation complete; Phase 0b remains incomplete. Implementation commit above; this handoff is committed afterward. [PR #21](https://github.com/VeroxAUS/t3code/pull/21) into `overlay/main` is open; local checks pass, CI completion is not claimed. Never merge from this thread.
 
 ## Done, verified
 
+- Pushed the step branch and opened [PR #21](https://github.com/VeroxAUS/t3code/pull/21) into `overlay/main`; not merged. Evidence: `gh pr view 21 --repo VeroxAUS/t3code --json url,state,baseRefName,headRefName,statusCheckRollup` → OPEN, correct step head and integration base; CI completion remains unclaimed.
 - Gate/base: `git fetch origin`, `git merge-base --is-ancestor origin/overlay/main HEAD`, `git rev-parse HEAD origin/overlay/main`, `gh pr view 20 --repo VeroxAUS/t3code --json state,mergeCommit` → clean existing step-2 branch at current `origin/overlay/main`, `a4a1f62aa91dee03c089026303020ce8c445f191`; step 1 merged at that SHA, no unanswered handoff questions.
 - Added only `apps/server/src/routing/ReplayDurability.spike.test.ts`, `docs/overlay/spikes/replay-durability.md` and this handoff. `git diff --name-only origin/overlay/main` → overlay-owned paths only; no production runtime, migration, subscription, contract, UI or manifest change.
 - Actual stored events and app-thread/run/attempt links traced read-only in the isolated `.t3/userdata/statev2.sqlite`. Proof: the Python command in `docs/overlay/spikes/replay-durability.md` → captures 148/189/252 agree with run and provider-thread links; attempt back-pointers are null. Claude refs change weak→strong→weak within one stored turn ID; normalized billable usage is only present at terminal events 148/189, absent from ACP 252.
