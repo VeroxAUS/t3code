@@ -8,13 +8,13 @@ Everything downstream (router, budgets, team view) needs two signals that T3 doe
 
 - `OrchestrationV2ProviderTurn.tokenUsage` and `turnTokenUsage` arrive on `provider-turn.updated`; the ingestor reads `turnTokenUsage` (`usageStatus`, `usageScope: "main_agent"`, `hasSubagents`).
 - `OrchestrationV2ProviderThread.contextUsage` arrives on `provider-thread.updated`; only ACP fills its optional `cost`.
-- `ProviderEventIngestor.ts` forwards per-turn usage to analytics (`analytics.record(...)`, event `provider.turn.completed`, ~L871) and nowhere else.
+- `ProviderEventIngestor.ts` persists provider-turn updates, then forwards terminal usage to analytics (`ProviderTurnAnalytics.record`, event `provider.turn.completed`) with an in-memory completion dedupe. The analytics callback is not a replay source.
 - Rates: `UsageService` fetches LiteLLM's `model_prices_and_context_window.json` (24h TTL, cached at `<stateDir>/usage-model-rates.json`), `usagePricing.ts` parses it, `ServerSettings.usagePriceOverrides` and `usageModelAliases` override it.
 - Historical usage buckets are keyed by day/hour/provider/model/source path, **not** by thread or run.
 
 ### Spec
 
-`apps/server/src/routing/CostLedger.ts`, an Effect service subscribed to the orchestration event stream (same pattern as `PullRequestSyncReactor` and `UsageLimitRecoveryWorker`). Phase 0b's token-semantics and replay-durability spikes confirm the details below before Phase 1 implements them.
+`apps/server/src/routing/CostLedger.ts`, an Effect service subscribed to the orchestration event stream (same pattern as `PullRequestSyncReactor` and `UsageLimitRecoveryWorker`). The numbered rules below are proposed ledger invariants. Phase 0b’s token-semantics and replay-durability spikes must establish the actual stored event fields, durable identity and provider coverage before Phase 1 implements them. Antigravity/Google AI Pro is in live scope; missing ACP token buckets must remain unavailable, never zero spend inferred from context usage.
 
 1. **Durable turn identity.** A row is keyed by `(threadId, runId, providerTurnRef)`, where `providerTurnRef` is the native turn id when the provider's identity capability is `strong` and `(runId, turn ordinal)` otherwise. Providers re-emit cumulative totals per turn, so the upsert _replaces_ the row's token buckets with the latest cumulative values; a duplicate or re-delivered event is harmless.
 2. **Disjoint buckets.** T3's token contract (`packages/contracts/src/providerRuntime.ts`) defines input as including cache reads and cache writes, and output as including reasoning. Store `uncachedInput = input - cacheRead - cacheWrite`, `cacheRead`, `cacheWrite`, and `output` (reasoning inside it, never priced twice):

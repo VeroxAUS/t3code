@@ -45,6 +45,8 @@ Rules
 - **`scripts/overlay-check.ts` (Phase 0 step 6) runs on every PR and in the nightly sync.** It fails when the PR's changed upstream paths (anything outside the overlay-owned paths) and the manifest `docs/overlay/CHANGES.md` disagree in either direction, when a PR that changes upstream paths carries no file under `docs/overlay/handoffs/` (the tag sync writes `sync-<tag>.md`, so sync PRs pass), or when `vp test run packages/routing` fails. It is a required check on `overlay/main`.
 - **Gates that need time, not code.** Phase 3 opens only when `decisions.md` holds a developer-signed line "shadow report reviewed, matrix tuned", the decision log holds at least 14 days **and** 200 decisions with every role represented, and the Phase 3 canary in `07-roadmap.md` has passed. The final review (`prompts/_final-review.md`) opens only when the newest `phase-N-review*.md` of every phase has `status: passed` and `decisions.md` holds "overlay build in daily use since <date>" at least two weeks old.
 
+- **Interrupted design round:** commit and push docs plus a clearly labelled WIP handoff on the same branch; preserve accepted answers, remaining backlog rows and the exact pending question. No completion claim or final design PR. Resume on the same branch with the plan-column model on either vendor; validate the original previous-phase passed review. Follow the launch syntax and metadata in `prompts/_design-round.md` → Interrupted design rounds. A WIP handoff is a resume link, never a passed phase or a step-1 gate.
+
 Handoff template (every link; state only, no prompt text)
 
 ```
@@ -81,7 +83,7 @@ Prompts live in `DOCS/prompts/` (`DOCS` is `docs/overlay/` once Phase 0 step 5 h
 
 - `_preamble.md`: every thread reads it first. The gate, the read order, the repo rules CI enforces, branch and PR naming, how to finish.
 - `_design-round.md`, `_review.md`, `_fix.md`: generic, parameterised by phase number.
-- `phase-0/step-0.md` to `step-6.md`: written now, because Phase 0 is plumbing. Later phases' step prompts are written by that phase's design round in a markdown-only PR you approve, because they depend on what earlier phases find (the Windows toolchain, the real package layout, what shadow mode shows, upstream drift).
+- `phase-0/step-0.md` to `step-8.md`: Phase 0 plumbing. `phase-0b/step-1.md` to `step-5.md`: contract spikes, including Antigravity/Google AI Pro live coverage. Later phases' step prompts are written by that phase's design round in a markdown-only PR you approve, because they depend on what earlier phases find (the Windows toolchain, the real package layout, what shadow mode shows, upstream drift).
 
 A thread is started with one line in the composer:
 
@@ -361,7 +363,7 @@ Codex alternative for any step: `codex --model gpt-6.1-sol -c model_reasoning_ef
 
 For steps that edit files (1 onward), start Claude Code with `claude --permission-mode acceptEdits` so it does not ask before every file write; shell commands still ask.
 
-Phases 0, 0b and 1 run in these plain CLIs inside Ubuntu. From Phase 2 the fork's own server runs in Ubuntu and the chain is driven from the T3 cockpit (dogfooding).
+Code-only work in Phases 0, 0b and 1 can run in these plain CLIs inside Ubuntu. Phase 0b live probes need a T3 session connected to isolated dev state with the actual launch/delegation tools available; a plain CLI without those tools cannot prove the T3 path. From Phase 2 the chain is driven from the T3 cockpit for daily dogfooding.
 
 ### 8. After each thread (repeat for every step)
 
@@ -402,4 +404,4 @@ git fetch origin && git switch -c overlay/phase-0-review origin/overlay/main
 codex --model gpt-6.1-sol -c model_reasoning_effort=low
 ```
 
-Paste the complete handoff's `Next` line. A passed review hands you the Phase 0b design-round launch line; run it on Opus 5.5 High (`claude`, `/model opus`, `/effort high`). Phase 0b's five contract spikes settle token semantics, replay durability, real role permissions, candidate workspaces and the API-credit billing route before the Phase 1 design round writes any Phase 1 prompt. Do §8.1's Claude API credit steps before launching the design round, so spike 5 has an instance to test.
+Paste the complete handoff's `Next` line. A passed review hands you the Phase 0b design-round launch line; run it on Opus 5.5 High (`claude`, `/model opus`, `/effort high`). Phase 0b’s five contract spikes settle token semantics (Claude, Codex and Antigravity/Google AI Pro live), replay durability, real role permissions, candidate workspaces and the separate Claude API-credit billing route before the Phase 1 design round writes any Phase 1 prompt. Do §8.1's Claude API credit steps before launching the design round, so spike 5 has an instance to test.
