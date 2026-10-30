@@ -10,6 +10,8 @@ Given a task's role and requested tier, the parent's model, every provider's pre
 - Every `delegate_task`, `create_threads`, `t3_thread_launch`, and scheduled launch starts a fresh provider thread anyway. Routing there costs nothing extra.
 - An existing thread changes model only (a) at a compaction boundary, (b) when its provider is `exhausted` and the user accepts the pending "continue on <provider> with a handoff" request, or (c) on explicit user action. Case (b) uses T3's provider-switch context handoff (delta summary, 16k token cap); there is no automatic path.
 
+Antigravity/Google AI Pro is a Phase 0b candidate for lighter work, not a preselected routing tier. Its live token availability, permission map and exposed models must inform the Phase 1/2 designs; the trial price is not evidence of task quality. Claude Credit remains a distinct instance and budget source, even though it uses the same Claude adapter.
+
 ## Inputs (signals)
 
 | Signal               | Source                                                                                               | Notes                                                                                                                             |

@@ -29,17 +29,17 @@ Keep T3 Code as the base. It already has the expensive parts: ten provider adapt
 5. `05-delegation-engine.md` — roles, decomposition rules, pipeline templates, verification/review loops, merge queue, best-of-N.
 6. `06-cockpit-ui.md` — the team view / mission control spec.
 7. `07-roadmap.md` — phases, steps, file touch lists, tests, effort.
-8. `08-idea-backlog.md` — 36 further ideas rated by value and cost.
-9. `09-risks-and-open-questions.md` — what can bite, and the questions only you can answer.
+8. `08-idea-backlog.md` — 38 ideas rated by value and cost.
+9. `09-risks.md` — implementation risks; accepted answers live in decisions.md and unresolved choices under their phase in 07-roadmap.md.
 10. `10-execution-plan.md` — model and effort per phase, the handoff chain, the Phase 0 launch, the Fable review round, how rounds work.
 11. `11-single-machine-and-cloud.md` — running on one machine, when a VM is worth it, cloud options.
 12. `12-ui-ux.md` — the team view hub design; mockup in `mockups/team-view.html`.
 
-Thread prompts live in `prompts/`: `_preamble.md` (every thread reads it first), `_design-round.md`, `_review.md`, `_fix.md`, `_ask.md` (a question thread outside the chain; edits only `inbox.md`), and `phase-0/step-0.md` to `step-6.md`. Later phases' step prompts are written by each phase's design round. Start any thread with one line: `Run <prompt file> [for phase N] with handoff <handoff file>`. Phase 0 starts with `Run docs/multi-agent-harness/prompts/phase-0/step-0.md with handoff none` on Sonnet 5.5 Medium.
+Thread prompts live in `prompts/`: `_preamble.md` (every thread reads it first), `_design-round.md`, `_review.md`, `_fix.md`, `_ask.md` (a question thread outside the chain; edits only `inbox.md`), and the numbered prompts under `phase-0/` and `phase-0b/`. Later phases' step prompts are written by each phase's design round. Start any thread with one line: `Run <prompt file> [for phase N] with handoff <handoff file>`. Phase 0 starts with `Run docs/multi-agent-harness/prompts/phase-0/step-0.md with handoff none` on Sonnet 5.5 Medium.
 
 ## Assumptions these docs make
 
-- Spend is subscriptions: Claude Max 5x today (recommended upgrade: Max 20x) and ChatGPT Plus for Codex (5-hour + weekly windows). API keys are secondary, with one exception: the Max plan's monthly API credit (US$100 on 5x, US$200 on 20x, expiring each cycle) carries the cheap tier through one `Claude Credit` provider instance (09 answer 14, Phase 0b spike 5). So "cost" means window consumption first, API-equivalent dollars second. There is no overage: paid overflow is switched off at the provider accounts and T3 has no paid fallback.
+- Spend is subscriptions: Claude Max 5x today (recommended upgrade: Max 20x) and ChatGPT Plus for Codex (5-hour + weekly windows). API keys are secondary, with one exception: the Max plan's monthly API credit (US$100 on 5x, US$200 on 20x, expiring each cycle) carries the cheap tier through one `Claude Credit` provider instance (decisions.md 18, Phase 0b spike 5). So "cost" means window consumption first, API-equivalent dollars second. There is no overage: paid overflow is switched off at the provider accounts and T3 has no paid fallback.
 - One developer plus agents, one machine (i7-13700K, 32 GB, RTX 4080, Windows 11) for now, developing inside WSL2 because upstream's own Windows test workflow says nothing in the suite passes on Windows yet; a VM as a second T3 environment later if always-on automations are wanted.
 - Quality floor: implementation work stays on at least a Sonnet-5.5-class model (Sonnet 5.5, GPT-6.1 Sol) unless you explicitly opt a task down. Confirmed by the user 2026-10-29. Cheap tiers are for reading, searching, summarising, classifying and narrow mechanical edits.
 - Numbers quoted for pricing and benchmarks were verified on 2026-10-29 against vendor pages where possible; the router must read live rates from the LiteLLM table T3 already fetches, never from constants.

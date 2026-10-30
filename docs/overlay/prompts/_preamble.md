@@ -14,13 +14,13 @@ One thread in a chain building the multi-agent overlay on this T3 Code fork (`Ve
 
 Your launch line names a handoff file. Open it first. If it is missing, stop and tell the developer. Your prompt states which predecessor it accepts:
 
-| Prompt             | Accepts                                                             |
-| ------------------ | ------------------------------------------------------------------- |
-| a step prompt      | the previous step's handoff, or the design-round handoff for step 1 |
-| `_design-round.md` | a review handoff with `status: passed`                              |
-| `_review.md`       | a complete handoff, or a fix handoff for a re-review                |
-| `_fix.md`          | a review handoff with `status: findings`                            |
-| `_final-review.md` | the last phase's review handoff with `status: passed`               |
+| Prompt             | Accepts                                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| a step prompt      | the previous step's handoff, or the design-round handoff for step 1                                          |
+| `_design-round.md` | a review handoff with `status: passed`, or a same-phase WIP resume that validates the original passed review |
+| `_review.md`       | a complete handoff, or a fix handoff for a re-review                                                         |
+| `_fix.md`          | a review handoff with `status: findings`                                                                     |
+| `_final-review.md` | the last phase's review handoff with `status: passed`                                                        |
 
 If the file's `status` or kind does not match what your prompt accepts, stop and tell the developer. Then read the handoff's "Gotchas" and "Open questions": an answered question is a decision you follow; an unanswered one you never guess at. Stop and ask.
 
