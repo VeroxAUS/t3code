@@ -3,6 +3,7 @@ name: Overlay sync
 on:
   schedule:
     - cron: "17 3 * * *"
+    - cron: "*/10 * * * *" # temporary: proves the schedule fires; removed in the next PR
   workflow_dispatch:
 
 permissions:
