@@ -32,5 +32,6 @@ Review 2's only finding (no `schedule` run of `overlay-sync.yml`) is still open 
 
 - Does the missing scheduled run still block Phase 0?
   Recommended: No — record in `decisions.md` that the manual run proves the sync job and that scheduled-trigger evidence carries into Phase 0b as an open item with the support ticket, so the re-review can pass; the cost of the fault is late upstream syncs, which a manual dispatch covers.
+  Answer: No. The manual run 40822950375 proves the sync job; scheduled-trigger evidence carries into Phase 0b with the GitHub support ticket (decisions.md 16).
 
 Next: Run docs/overlay/prompts/_review.md for phase 0 with handoff docs/overlay/handoffs/phase-0-fix-3.md — on GPT-6.1 Sol minimal
