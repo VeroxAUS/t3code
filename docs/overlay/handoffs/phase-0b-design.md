@@ -9,6 +9,7 @@ Branch `overlay/phase-0b-design` · worktree `/home/verox/src/t3code-phase-0`. D
 
 ## Done, verified
 
+- Design PR: https://github.com/VeroxAUS/t3code/pull/19 into `overlay/main`; opened, not merged.
 - Gate/base: `git fetch origin && git merge-base --is-ancestor origin/overlay/main HEAD` → pass; integration base `24a51ee3c6130aa9f31ad0d297908cf2d3e81ec0`. Kept the developer-named branch and its two existing commits. The named Phase 0 review has `status: passed`; its action result records disable/enable and support ticket #4927935.
 - Read all Phase 0 handoffs, phase scope/promoted table, backlog, inbox, decisions, 02/03/04/05 and execution plan, and the Phase 0 prompt models. `rg --files docs/overlay/spikes` → no spike markdown yet.
 - Five prompts in `docs/overlay/prompts/phase-0b/`, one per roadmap step, each 31 lines with execute model/effort, gate, commands, successor and required Finish paragraph. Step 5 writes the complete handoff and starts the other-vendor review.
