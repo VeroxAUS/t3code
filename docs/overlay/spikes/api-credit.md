@@ -113,6 +113,13 @@ All times UTC, 2026-10-31. Readings are developer-supplied: Billing & payments p
 - Readings at 14:09Z: Billing & payments US$99.95 (baseline 99.98, change -0.03); dashboard US$99.96 (baseline 99.99, change -0.03); Max session 0 percent; weekly 0 percent.
 - Reading: the credit balance fell on both pages while the Max window stayed at 0 percent, after requests that ran only under the credit instance and with the live install's `Claude Credit` text generation disabled. A displayed fall of 3 cents against an arithmetic 2.29 cents is within one cent of display quantization (a floored or rounded cent display can turn 2.29 cents into 2 or 3 displayed cents depending on the starting fraction), so it neither confirms the arithmetic nor contradicts it. The Max window not moving at this size is a weak negative on its own. Attribution to request 2 rather than request 1 is not claimed: the 14:07Z reading after request 1 alone showed no change, and the later fall is cumulative. Hourly Usage-page rows are still needed to separate the two by model.
 
+### Request 3: title regeneration (text generation on `Claude Credit` Haiku 5.5, effort low)
+
+- Coordinator `t3_thread_update` (`regenerate_title`, `clientRequestId` `p0b5-title-regen-1`) on the Haiku probe thread: command sequence 3142 at 15:05:48.571Z; title updated at sequence 3160, 15:05:53.487Z, from `Phase 0b credit probe - Haiku 5.5` to `Phase 0b credit probe`; regeneration marker cleared.
+- Native transcript, in the credit config directory under a temporary folder `-tmp-t3code-claude-title-*` (T3's `claude -p` text-generation path): model `claude-haiku-5-5`, `standard` tier, uncached input 2, cache read 1,104, cache write 3,821 (5-minute bucket), output 374. Two transcript records at 15:05:51.955Z and 15:05:52.159Z carry identical usage; they are treated as one API response written as two content blocks unless the message ID check below says otherwise. T3 persists no token usage for this path, so the native transcript is the only token record.
+- API-equivalent arithmetic (not a measured charge): 2 x $0.10 + 1,104 x $0.01 + 3,821 x $0.125 + 374 x $0.50 per million = about US$0.00068 (about US$0.00135 if the two records were separate responses).
+- Readings at 15:07Z: Billing & payments US$99.95, dashboard US$99.96, Max session 0 percent, weekly 0 percent; unchanged from 15:03Z. Expected: the charge is far below a cent.
+
 ## Results
 
 | Item                                  | Result                                 |
