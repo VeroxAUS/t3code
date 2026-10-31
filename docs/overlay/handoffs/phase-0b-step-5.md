@@ -48,8 +48,10 @@ Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` ·
 
 - Do you authorize the four-request probe sequence in the spike, with Sonnet 5.5 included (ceiling about US$0.15)?
   Recommended: yes, as written — a single request of each kind is the minimum that can attribute billing, and the ceiling is under 0.2 percent of the credit.
+  Answer: Yes.
 - Should the batch script read the key in-process from the instance secret file, or will you run it with the key in your own environment?
   Recommended: you run it through `!` with your environment — the key then never enters my process or transcript.
+  Answer: The developer runs it, from steps the agent supplies.
 - Will you supply the readings by hand, or start a session with a browser tool for this step?
   Recommended: by hand, as two short before/after text snippets — it needs no browser authorization and no screenshots.
 
