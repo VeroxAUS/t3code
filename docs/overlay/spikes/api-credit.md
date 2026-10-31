@@ -1,8 +1,8 @@
 # API-credit billing spike (#37)
 
-**Status: paused before any paid request. In-T3 credit routing: `no-go: inconclusive` (gate closed). Batch result: not run.**
+**Status: all four authorized paid requests ran on 2026-10-31 (14:06 to 16:08Z); per-request attribution awaits the developer's Usage-page hourly rows. In-T3 credit routing: `no-go: inconclusive` (gate closed). Separate batch result: the Haiku batch request succeeded at the batch tier; its funding source awaits the same rows.**
 
-Baseline: `8fd48a96846121c5cf8723ee196c4dc24a4ea03e` on `overlay/phase-0b-step-5` (current `origin/overlay/main` is `6169024ecf`, the step-4 merge; the branch adds one inbox-only commit). Preparation date: 2026-10-31. Runtimes: Claude Code 2.1.316 on PATH, 2.1.312 reported by the `Claude Credit` instance cache; Node v26.12.1; vp 1.4.0. No paid Haiku/Sonnet turn, title regeneration or Message Batches request has been made by this step. Nothing below is billing evidence for T3; it is preparation, vendor references and the proposed protocol awaiting developer authorization.
+Baseline: `8fd48a96846121c5cf8723ee196c4dc24a4ea03e` on `overlay/phase-0b-step-5` (current `origin/overlay/main` is `6169024ecf`, the step-4 merge; the branch adds one inbox-only commit). Preparation date: 2026-10-31. Runtimes: Claude Code 2.1.316 on PATH, 2.1.312 reported by the `Claude Credit` instance cache; Node v26.12.1; vp 1.4.0. The developer authorized the proposed sequence on 2026-10-31 and the four requests ran as scheduled below; each request's evidence is in the probe log, with arithmetic labelled separately from measurements.
 
 ## What this step must decide
 
@@ -76,9 +76,9 @@ The Console balance is a cent-rounded figure. Public cents cannot resolve most s
 
 Distinguishability by design: the thread turns use different models (Haiku, then Sonnet). Title regeneration is also Haiku, so it is separated from the Haiku turn by an order and a reading between them, and its request is the only one carrying a distinctive prompt length. The batch is Haiku at the batch rate in its own request with a known token count. If the Usage page cannot separate two same-model requests, they are reported as overlapping and the result stays inconclusive; the protocol is not repeated to force a visible change.
 
-## Proposed probe sequence (not run; each paid step needs explicit developer authorization)
+## Probe sequence (authorized by the developer 2026-10-31; ran as scheduled)
 
-Estimated cost at the rates above, from the fixture's token shape; an upper bound for a tiny turn with a Claude Code system prompt of about 27k tokens and no tools:
+Pre-run estimate at the rates above, from the fixture's token shape (actuals are in the probe log); an upper bound for a tiny turn with a Claude Code system prompt of about 27k tokens and no tools:
 
 | #   | Request                                                                                                                                | Model      | Expected billable tokens (order of magnitude)         | Expected API-equivalent  |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------- | ------------------------ |
@@ -135,27 +135,32 @@ Reading at 16:05Z: Billing & payments US$99.95, dashboard US$99.96, Max session 
 
 ## Results
 
-| Item                                  | Result                                 |
-| ------------------------------------- | -------------------------------------- |
-| Free readings before any paid request | not taken in this session (see limits) |
-| Haiku 5.5 thread turn                 | not run                                |
-| Sonnet 5.5 thread turn                | not run                                |
-| Title regeneration                    | not run                                |
-| Haiku Message Batches request         | not run                                |
-| Batch discount versus same-model rate | documented 50 percent, not measured    |
-| Agent SDK versus Claude Code class    | unresolved; vendor text only           |
-| Max-window effect                     | not measured                           |
+Final readings after all four requests, 16:16Z: Billing & payments US$99.95, dashboard US$99.96, Max session 1 percent (investigating session; see above), weekly 0 percent. The balance fell 3 displayed cents over the run (US$99.98 to US$99.95 on Billing & payments), all between 14:07Z and 14:09Z after the Sonnet turn; requests 3 and 4 produced no visible change, as expected at their size.
 
-**In-T3 credit routing: `no-go: inconclusive`.** Under decision 30 the gate stays closed until the billing source is established. Phases 1 to 3 credit steps stay out of scope. This is not a finding that credit billing fails, and no probe has been repeated or escalated. The external digest's batch evidence is also pending and independent of this verdict.
+| Item                                          | Result                                                                                                                                                                                                                |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Free readings before any paid request         | Taken 2026-10-31 (developer-supplied); recorded above                                                                                                                                                                 |
+| Haiku 5.5 thread turn (14:06Z)                | Ran on the credit instance and config directory; 2 / 13,066 / 8,900 / 15 tokens; arithmetic about US$0.00125                                                                                                          |
+| Sonnet 5.5 thread turn (14:08Z)               | Ran on the credit instance and config directory; 2 / 13,066 / 8,077 / 15 tokens; arithmetic about US$0.02165                                                                                                          |
+| Title regeneration (15:05Z)                   | Ran through the text-generation path on the credit config directory; 2 / 1,104 / 3,821 / 374 tokens; arithmetic about US$0.00068                                                                                      |
+| Haiku Message Batches request (16:08Z)        | Succeeded in 95 seconds, `service_tier` `batch`, 25 in / 14 out; arithmetic US$0.00000475                                                                                                                             |
+| Batch discount versus same-model rate         | Verified in the rate table and the response tier (exactly half of US$0.0000095); not measurable as a charge                                                                                                           |
+| Funding source (promotional credit)           | **Supported, not established.** Balance fell with only the probes using the key, no purchased balance or payment method, and all four requests succeeded; per-request attribution awaits the Usage page's hourly rows |
+| Agent SDK versus Claude Code class            | Both T3 paths succeeded on the key with no other funding source; the vendor says credit does not cover Claude Code and refuses uncovered requests when only credit exists. This favours coverage but is inference     |
+| Max-window effect                             | **Not measurable**: confounded by the investigating Claude Code session (developer-attributed); not evidence either way                                                                                               |
+| Per-request attribution (Usage page, by hour) | **Pending**: the developer supplies the hourly rows for workspace `t3-overlay`, 14:00 to 17:00Z, split by model                                                                                                       |
+
+**In-T3 credit routing: `no-go: inconclusive`.** Under decision 30 the gate stays closed until per-request attribution is supplied. It would move toward `go` only if the Usage rows show Haiku tokens in hours 14 and 15 and 16 matching the three Haiku requests and Sonnet tokens in hour 14 matching request 2, with nothing else on the key; that is the developer's decision to take in the Phase 1 design round with this evidence, not an automatic promotion. If the rows cannot separate requests, the verdict stays inconclusive. No probe has been repeated or escalated. The batch result is separate: the request succeeded at the batch tier and rate; its funding source also awaits the Usage rows.
 
 ## Limits and coverage gaps
 
-- No browser or computer-use tool exists in this session, so the developer's browser authorization could not be exercised; billing-page readings must come from the developer or a session with such a tool.
-- No T3 launch tools here; probe turns depend on the isolated coordinator.
-- Cent-rounded balances; unknown dashboard latency; the Usage page's granularity is unmeasured.
-- Vendor eligibility text for `claude -p` came from search summaries of the support articles; only the Platform credits page was read in full.
-- Tool-using turns, long contexts, Fable, subagents and non-Claude instances are out of scope.
-- Token fixtures from the paid turns (step 1 fixtures) would be captured only if the turns run.
+- The developer's browser authorization could not be exercised (no browser tool); all billing-page readings are developer-supplied text.
+- Cent-rounded balances; the Usage page lags a few hours; the Cost page is two-decimal and daily.
+- The Max window is confounded by the investigating session and unusable.
+- The coordinator's earlier 13:17Z project-creation turn ran on the subscription Claude instance before the coordinator was switched to Codex; it is outside the probe hours.
+- Vendor eligibility text for `claude -p` came from search summaries; only the credits page was read in full.
+- Tool-using turns, long contexts, Fable, subagents and non-Claude instances are out of scope. Process environment of the spawned credit-instance `claude` was not read; isolation rests on transcripts landing in `~/.claude_credit` and none in `~/.claude`.
+- Token fixtures: the counts above are recorded here; no fixture file or test was changed.
 
 ## Reproduction (reads only)
 
