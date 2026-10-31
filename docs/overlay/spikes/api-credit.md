@@ -105,6 +105,14 @@ All times UTC, 2026-10-31. Readings are developer-supplied: Billing & payments p
 - API-equivalent arithmetic (not a measured charge): 2 x $0.10 + 13,066 x $0.01 + 8,900 x $0.125 + 15 x $0.50 per million = about US$0.00125. With a 1-hour write rate it would be about US$0.00192, but the transcript reports a 5-minute write.
 - Readings at 14:00Z baseline and at 14:07Z after: US$99.98 / US$99.99 / 0 / 0 and US$99.98 / US$99.99 / 0 / 0. No movement, as expected at this size; this is neither evidence for nor against credit billing.
 
+### Request 2: Sonnet 5.5 thread turn (instance `claudeAgent_claude_credit`)
+
+- Launch by the Codex coordinator: thread `mcp:9fb20c80-2c08-4efb-896e-90a9b863cb2a`, run ordinal 1, requested 14:08:43.415Z, started 14:08:43.465Z, completed 14:08:46.050Z, reply `CREDIT_PROBE_OK`.
+- Persisted turn and native transcript (credit config directory) agree: model `claude-sonnet-5-5`, `standard` tier, uncached input 2, cache read 13,066, cache write 8,077 (all 5-minute bucket), output 15. No title-related event after 14:00Z.
+- API-equivalent arithmetic (not a measured charge): 2 x $2 + 13,066 x $0.10 + 8,077 x $2.50 + 15 x $10 per million = about US$0.02165. Cumulative with request 1 since the 14:00Z baseline: about US$0.02290.
+- Readings at 14:09Z: Billing & payments US$99.95 (baseline 99.98, change -0.03); dashboard US$99.96 (baseline 99.99, change -0.03); Max session 0 percent; weekly 0 percent.
+- Reading: the credit balance fell on both pages while the Max window stayed at 0 percent, after requests that ran only under the credit instance and with the live install's `Claude Credit` text generation disabled. A displayed fall of 3 cents against an arithmetic 2.29 cents is within one cent of display quantization (a floored or rounded cent display can turn 2.29 cents into 2 or 3 displayed cents depending on the starting fraction), so it neither confirms the arithmetic nor contradicts it. The Max window not moving at this size is a weak negative on its own. Attribution to request 2 rather than request 1 is not claimed: the 14:07Z reading after request 1 alone showed no change, and the later fall is cumulative. Hourly Usage-page rows are still needed to separate the two by model.
+
 ## Results
 
 | Item                                  | Result                                 |
