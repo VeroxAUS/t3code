@@ -193,7 +193,7 @@ setupFilesObserved: []
 
 ## Setup effects
 
-The tracked `setup.cjs` is exactly:
+The tracked `setup.cjs` contains this program (formatting normalized):
 
 ```js
 const fs = require("node:fs");
@@ -245,6 +245,8 @@ cd apps/server
 ```
 
 Result: 2 files passed, 4 tests passed, 40 outside-filter cases skipped. These cover fetched commit/base selection, attachment path validation and invalid-base rejection at the existing service/handler test layers. They are supporting checks, not a substitute for the required live SHA/sentinel evidence.
+
+Root acceptance: `vp run check:changed origin/overlay/main` → pass for the two overlay documentation files; format passes and code/dependency checks skip appropriately. An initial sandbox `spawnSync git EPERM` required an escalated rerun. No production code, test or dependency changed; no repo-wide checks.
 
 ## Cleanup and operational carryover
 
