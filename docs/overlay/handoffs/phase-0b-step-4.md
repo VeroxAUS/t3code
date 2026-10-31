@@ -1,14 +1,15 @@
 # Handoff · Phase 0b · Step 4 · 2026-10-31 · written by GPT-6 / Codex
 
-commit: b784f50751f1cf4d827e5e2e0c0d11836b8c9d8d
+commit: 8184e97f7cf2a5fe49edef2dd72428bf7fdf17c6
 supersedes: docs/overlay/handoffs/phase-0b-step-3.md
 
 ## Where we are
 
-Branch `overlay/phase-0b-step-4` · worktree `/home/verox/src/t3code-phase-0`. Candidate workspace investigation delivered in `docs/overlay/spikes/candidate-workspace.md`; Phase 0b remains incomplete. The commit above records the spike before this handoff. Local checks pass; PR creation pending, no CI completion claimed. Never merge from this thread.
+Branch `overlay/phase-0b-step-4` · worktree `/home/verox/src/t3code-phase-0`. Candidate workspace investigation delivered in `docs/overlay/spikes/candidate-workspace.md`; Phase 0b remains incomplete. The commit above precedes this PR metadata update. Branch pushed; [PR #23](https://github.com/VeroxAUS/t3code/pull/23) into `overlay/main` is open. Local checks pass; CI completion is not claimed. Never merge from this thread.
 
 ## Done, verified
 
+- Requested PR opened: `gh pr create --repo VeroxAUS/t3code --base overlay/main --head overlay/phase-0b-step-4 --title 'overlay: phase 0b step 4 — candidate workspace isolation' --body-file /tmp/phase0b-step4-pr-body.md` → [PR #23](https://github.com/VeroxAUS/t3code/pull/23). `git push -u origin HEAD` published the step-4 branch and set its upstream; never merged.
 - Gate/base: `git fetch origin`, `git merge-base --is-ancestor origin/overlay/main HEAD`, `git rev-parse HEAD origin/overlay/main` → clean existing step-4 branch at `a1ec007be82fdc4156be3db73d226d29a62ea083`, the merged step-3 revision, with no unanswered predecessor questions.
 - Disposable fixture: `python3 /tmp/phase0b-step4-prepare.py`, initial capture commands and `git status --short --untracked-files=all` → base `721b565e645ead2fdb6f75f15dd35ede822018aa`, distinct candidate `921fe73a6d7173e4d57614718a95084dc8b663b3`, writer HEAD `c96e6e133476e25b71771c45662bd91713a05a0f`; writer has staged/unstaged edits plus untracked/ignored sentinels. Separate existing worktree starts at the base with its own dirt. Exact bytes, statuses, hashes and launch inputs are in the spike; no contributor checkout was used as a fixture.
 - Actual T3 launches: developer-relayed `t3_project_create`, two structured `t3_thread_launch` requests and `t3_thread_read` → project `mcp:f2b9d617-2b0b-43be-8f66-22719695ac25`; fresh thread `mcp:b8417040-d8cb-48ce-85f9-af3a5d98d7f2` bound to `/home/verox/src/t3code-phase-0/.t3/worktrees/writer/p0b4-fresh-candidate`; attachment thread `mcp:daec640e-9e18-4201-ac42-42da581eeb47` bound to `/tmp/phase0b-step4-20261031/existing`. Completed launch events 2421/2559 agree with raw inputs/responses. Both idle, zero runs/requests, no provider execution; no shell-only substitute or launch retry.
@@ -41,7 +42,7 @@ Branch `overlay/phase-0b-step-4` · worktree `/home/verox/src/t3code-phase-0`. C
 
 ## Developer actions
 
-- Review/merge this step's PR when satisfied; the agent never merges. Launch step 5 from updated `origin/overlay/main` afterward.
+- Review/merge [PR #23](https://github.com/VeroxAUS/t3code/pull/23) when satisfied; the agent never merges. Launch step 5 from updated `origin/overlay/main` afterward.
 - Before Phase 0b review, resolve step 3's required unattempted permission coverage with targeted probes or an explicit developer deferral, preserving untested labels until resolved. Positive setup behavior needs its own correctly configured probe if later work relies on it; no production script-setting fix is authorized here.
 - Before step 5, configure the separate Claude Credit instance under `docs/overlay/10-execution-plan.md` §8.1 and supply fresh isolated billing/Max-window readings or the browser authorization that step requires. Preserve subscription instance separation; the isolated coordinator/server can be reused.
 - Sync: disable/enable was already performed; ticket **#4927935** remains pending. At the next relevant daily slot run `gh run list --repo VeroxAUS/t3code --workflow overlay-sync.yml --json databaseId,event,conclusion,createdAt,url` and record a real scheduled-run URL or support response. If a new upstream tag arrives while scheduling remains broken, the developer can run `gh workflow run overlay-sync.yml --repo VeroxAUS/t3code --ref overlay/main`; record it as manual evidence only. No dispatch from this thread.
