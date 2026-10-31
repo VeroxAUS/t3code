@@ -120,6 +120,12 @@ All times UTC, 2026-10-31. Readings are developer-supplied: Billing & payments p
 - API-equivalent arithmetic (not a measured charge): 2 x $0.10 + 1,104 x $0.01 + 3,821 x $0.125 + 374 x $0.50 per million = about US$0.00068.
 - Readings at 15:07Z: Billing & payments US$99.95, dashboard US$99.96, Max session 0 percent, weekly 0 percent; unchanged from 15:03Z. Expected: the charge is far below a cent.
 
+### Request 4: Haiku 5.5 Message Batches request (temporary script, developer-run from WSL)
+
+- Script `/tmp/phase0b-step5/batch_probe.py submit` (outside the repository; key read from the process environment, never printed), one request, `custom_id` `overlay-credit-probe-1`, model `claude-haiku-5-5`, `max_tokens` 16, prompt `Reply BATCH_PROBE_OK only.`. The key was loaded by the developer from the credit instance's secret file, so it is the same key and workspace as requests 1 to 3.
+- Response: HTTP 200, API request ID `req_011Cgaby9NXJQEFc8B2KsBRB`, batch `msgbatch_01Q2Yhq4YbYw6F69CjJB3Hyd`, created 2026-10-31T16:08:03.624Z, `in_progress`, expires 2026-11-01T16:08:03Z.
+- Readings before submission (16:05Z): US$99.95 / US$99.96 / Max session 1 percent (investigating session, see below) / weekly 0 percent.
+
 ### Max-window confound (recorded 16:05Z)
 
 Reading at 16:05Z: Billing & payments US$99.95, dashboard US$99.96, Max session **1 percent**, weekly 0 percent. The session moved from 0 to 1 percent between 15:07Z and 16:05Z. The investigating Claude Code session itself runs on the Max subscription: its transcript shows 37 model calls since 14:00Z, the last at 16:03Z, with about 29,800 output tokens at large cached contexts, and T3's cached reader shows the current 5-hour window ending 18:59:59Z, meaning it opened at 14:00Z or soon after, when that session resumed. The developer reports no other Max use after 15:05Z (earlier work was on Codex). The probes themselves ran at 14:06, 14:08 and 15:05Z with immediate readings of 0 percent. The Max window therefore cannot separate the probes from the investigating session and is **not usable as a billing-source test** here. Attribution rests on the Usage page's hourly rows by model and on funding-source reasoning, not on the Max window.
