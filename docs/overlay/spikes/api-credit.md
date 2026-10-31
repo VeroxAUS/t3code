@@ -59,6 +59,8 @@ No request had been made by this step. Account identifiers are omitted.
 | Console Cost page                    | Two decimals. Month total US$0.01; today US$0.00.                                                                                                 |
 | Console Usage page                   | Hourly buckets exist for 2026-10-29: total tokens in 113,979, out 9,094. Today shows "No data. Recent usage can take a few hours to appear here." |
 
+Second credit reading, about 2026-10-31T13:25Z: Billing & payments shows US$99.98 promotional credit available (primary figure, same wording as the first reading); the console dashboard (`platform.claude.com/dashboard`) shows US$99.99 "Organization credits" (secondary). The pages round or refresh differently by one cent, so a one-cent change on either page is not attribution evidence. Every later reading records both pages with UTC times and uses the same two pages. The isolated T3's cached Max window (subscription instance, checked 2026-10-31T13:16:46Z) shows session 2 percent resetting at 14:00:00Z and weekly 0 percent, matching the manual reading; after 14:00Z the session counter should restart near 0 percent.
+
 Consequences: the Usage page can attribute by hour, but today's requests will not appear for hours, and the Cost page is two-decimal and daily. The 2026-10-29 token total at Haiku 5.5 rates is at most about US$0.016 (113,979 x $0.10 + 9,094 x $0.50 per million, ignoring cache pricing), consistent with the US$0.01 shown, which suggests the Usage page and Cost page agree to rounding but is not a per-request check. The balance fell by US$0.02 against a US$0.01 monthly cost, so cent rounding differs between the two pages.
 
 ## Measurement problem and design of the protocol
