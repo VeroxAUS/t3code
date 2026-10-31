@@ -2,7 +2,7 @@
 
 One line per change queued by an `_ask.md` thread. The next design round clears it.
 
-- 2026-10-31: Record support ticket #4927935's confirmation that the 03:17 UTC schedule is registered and native cron delivery may be delayed or dropped, retire the unregistered-schedule hypothesis, and decide whether to retain manual upstream-sync dispatches or add an external scheduler using the existing workflow_dispatch trigger, with an actual dispatched run as acceptance evidence (from: GitHub support response).
+- 2026-10-31: Record support ticket #4927935's confirmation that the 03:17 UTC schedule is registered and native cron delivery may be delayed or dropped, retire the unregistered-schedule hypothesis, and adopt the developer-approved external scheduler route using overlay-sync.yml's existing workflow_dispatch trigger against overlay/main; the next design round selects the scheduler, credential setup and native-cron disposition, with an actual externally dispatched run as acceptance evidence (from: GitHub support response; external scheduler approved).
 
 - 2026-10-30: Say in the step-1 developer action and prompt that the Antigravity install and Google sign-in happen in the isolated dev server the step-1 session drives (its own T3 home), not the live T3 install, and say who starts that server (from: what are the developer actions).
 - 2026-10-30: Make the Phase 1 credit fallback at `07-roadmap.md:111` say whether "OpenCode" means its free models and whether it is skipped when no instance is enabled, and have the Phase 1 design decide where Antigravity sits in that chain from the Phase 0b results (from: OpenCode free tier versus credit).
