@@ -5,10 +5,11 @@ supersedes: docs/overlay/handoffs/phase-0b-step-4.md
 
 ## Where we are
 
-Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` · based on `origin/overlay/main` `6169024ecf` plus one inbox-only commit (`8fd48a9684`). All four authorized paid requests ran. **One input is still outstanding:** the developer's Usage-page hourly rows (workspace `t3-overlay`, model split, 2026-10-31 14:00 to 17:00Z) that would attribute each request. Until then the billing verdict is `no-go: inconclusive` with the gate closed, which is what decision 30 requires; the spike says what would move it. Phase 0b is not complete and nothing here declares it passed. PR state: see "Done, verified". Never merge.
+Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` · based on `origin/overlay/main` `6169024ecf` plus one inbox-only commit (`8fd48a9684`). All four authorized paid requests ran. **One input is still outstanding:** the developer's Usage-page hourly rows (workspace `t3-overlay`, model split, 2026-10-31 14:00 to 17:00Z) that would attribute each request. Until then the billing verdict is `no-go: inconclusive` with the gate closed, which is what decision 30 requires; the spike says what would move it. Phase 0b is not complete and nothing here declares it passed. PR: [#24](https://github.com/VeroxAUS/t3code/pull/24) into `overlay/main`, open. Never merge.
 
 ## Done, verified
 
+- Requested PR opened: `git push -u origin HEAD` then `gh pr create --repo VeroxAUS/t3code --base overlay/main --head overlay/phase-0b-step-5` → [PR #24](https://github.com/VeroxAUS/t3code/pull/24); never merged.
 - Gate: `git fetch origin`, `git rev-parse HEAD origin/overlay/main` and the step-4 handoff, Open questions `- none` → step-4 PR #23 merged, branch descends from it.
 - Vendor references refreshed 2026-10-31 from the [credits page](https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers), [pricing](https://platform.claude.com/docs/en/about-claude/pricing) and [Message Batches](https://platform.claude.com/docs/en/build-with-claude/batch-processing) → Haiku 5.5 $0.10/$0.50 and Sonnet 5.5 $2/$10 per MTok, batch exactly half; Agent SDK credit-covered, Claude Code not. Only the credits page was read in full.
 - Authorization: developer authorized the exact four-request sequence (Sonnet included) and ran the batch themselves; readings were developer-supplied (no browser tool in this session).
