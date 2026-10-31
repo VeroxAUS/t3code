@@ -92,6 +92,19 @@ Authorized by the developer on 2026-10-31 (the sequence above, Sonnet 5.5 includ
 
 Mechanics, constrained by the session: this CLI session exposes no T3 launch tools (as in steps 1-4), so steps 1-3 go through the developer's isolated coordinator, relayed in one labelled block. The batch script reads the key in-process from the instance's secret file, which holds one value, and never prints it; the developer can instead run the script with the key in their own environment through `!`. Either way the transcript and committed evidence keep no key, no authorization header and no account identifiers.
 
+## Probe log
+
+All times UTC, 2026-10-31. Readings are developer-supplied: Billing & payments promotional credit (primary) / dashboard Organization credits (secondary) / Max session / Max weekly.
+
+### Request 1: Haiku 5.5 thread turn (instance `claudeAgent_claude_credit`)
+
+- Launch by the Codex coordinator (`t3_thread_launch`, explicit title, root workspace, `/tmp/t3-credit-probe`, no tools): thread `mcp:49264f54-139b-4b79-9146-411b8d067c8f`, run `run:thread:mcp%3A49264f54-139b-4b79-9146-411b8d067c8f:ordinal:1`, requested 14:06:24.975Z, started 14:06:25.077Z, completed 14:06:28.215Z. Response text `CREDIT_PROBE_OK`.
+- Persisted provider turn (database, read-only): complete, `main_agent`, input 21,968, cache read 13,066, cache write 8,900, output 15, reasoning 0, `hasSubagents` false. Provider thread instance `claudeAgent_claude_credit`, driver `claudeAgent`.
+- Native transcript, in the **credit** config directory `~/.claude_credit/projects/-tmp-t3-credit-probe/`: model `claude-haiku-5-5`, `service_tier` `standard`, uncached input 2, cache read 13,066, cache write 8,900 all in the 5-minute bucket (1-hour bucket 0), output 15. The same session left no transcript under `~/.claude/projects` for this folder. This shows the turn ran under the credit configuration directory, not the subscription login.
+- No title-related event exists after 14:00Z, so the launch triggered no title generation.
+- API-equivalent arithmetic (not a measured charge): 2 x $0.10 + 13,066 x $0.01 + 8,900 x $0.125 + 15 x $0.50 per million = about US$0.00125. With a 1-hour write rate it would be about US$0.00192, but the transcript reports a 5-minute write.
+- Readings at 14:00Z baseline and at 14:07Z after: US$99.98 / US$99.99 / 0 / 0 and US$99.98 / US$99.99 / 0 / 0. No movement, as expected at this size; this is neither evidence for nor against credit billing.
+
 ## Results
 
 | Item                                  | Result                                 |
