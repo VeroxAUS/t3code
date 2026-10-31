@@ -48,6 +48,19 @@ Source and file-presence observations only; no key, token or account detail was 
 
 Not verified: that the subscription instance (`claudeAgent`) cannot see `ANTHROPIC_API_KEY` from the server's base environment, and that the process environment of an actual spawned credit-instance `claude` contains the key. Both should be read from the coordinator's launched turns' provider-session records, or the claim withheld.
 
+## Free baseline readings (developer-supplied, about 2026-10-31T09:40Z, 20:40 AEDT)
+
+No request had been made by this step. Account identifiers are omitted.
+
+| Source                               | Reading                                                                                                                                           |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Console Billing, Promotional credits | US$99.98 available. Decision 15 recorded US$99.99 after one title regeneration on 2026-10-29, so earlier use already moved it.                    |
+| claude.ai Max usage                  | Session 2 percent, weekly 0 percent.                                                                                                              |
+| Console Cost page                    | Two decimals. Month total US$0.01; today US$0.00.                                                                                                 |
+| Console Usage page                   | Hourly buckets exist for 2026-10-29: total tokens in 113,979, out 9,094. Today shows "No data. Recent usage can take a few hours to appear here." |
+
+Consequences: the Usage page can attribute by hour, but today's requests will not appear for hours, and the Cost page is two-decimal and daily. The 2026-10-29 token total at Haiku 5.5 rates is at most about US$0.016 (113,979 x $0.10 + 9,094 x $0.50 per million, ignoring cache pricing), consistent with the US$0.01 shown, which suggests the Usage page and Cost page agree to rounding but is not a per-request check. The balance fell by US$0.02 against a US$0.01 monthly cost, so cent rounding differs between the two pages.
+
 ## Measurement problem and design of the protocol
 
 The Console balance is a cent-rounded figure. Public cents cannot resolve most single requests here: a Haiku turn with a Claude Code system prompt cost about US$0.003 on the subscription fixture `live-claude-1` (26,617 input of which 13,674 cache write; see `token-semantics.md`), which is under a cent. Rounded balances, delayed reporting or concurrent usage cannot prove each request's billing source. So attribution rests on evidence of different kinds, each recorded separately and never merged into one number:
