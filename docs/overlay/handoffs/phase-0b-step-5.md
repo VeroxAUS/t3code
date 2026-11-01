@@ -58,5 +58,6 @@ Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` ·
 
 - Do you accept the scoped `go` (Haiku 5.5 and Sonnet 5.5 thread turns without tools, and `claude -p` text generation, on `Claude Credit`) as admitting the _credit_ steps in Phases 1 to 3?
   Recommended: yes — every request was attributed to the key in the Console, the balance fell consistently, and no other funding source exists; the unexplained 2,382-token Haiku residual is about US$0.00026 and is a ledger unknown to design for, not a billing blocker.
+  Answer: yes
 
 Next: Run docs/overlay/prompts/_review.md for phase 0b with handoff docs/overlay/handoffs/phase-0b-complete.md — on GPT-6 Astra high if Claude executed the phase, or Claude Opus 5.5 High if Codex executed it; for mixed execution, review the other vendor's changes per 10 section 1

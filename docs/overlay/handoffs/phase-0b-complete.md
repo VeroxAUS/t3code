@@ -3,7 +3,7 @@
 commit: see the branch head; this handoff is committed with the work it describes
 supersedes: docs/overlay/handoffs/phase-0b-step-4.md
 
-All five steps have delivered. Required evidence is present or clearly unresolved below; only the phase review declares Phase 0b passed. Step 3's required permission probes remain unattempted and undeferred, so the review should expect that finding unless the developer acts first.
+All five steps have delivered. Required evidence is present or clearly unresolved below; only the phase review declares Phase 0b passed. Step 3's plan-mode write cells are explicitly deferred (decision 32); the other coverage gaps are listed below.
 
 ## Where we are
 
