@@ -122,7 +122,7 @@ All times UTC, 2026-10-31. Readings are developer-supplied: Billing & payments p
 
 ### Request 4: Haiku 5.5 Message Batches request (temporary script, developer-run from WSL)
 
-- Script `/tmp/phase0b-step5/batch_probe.py submit` (outside the repository; key read from the process environment, never printed), one request, `custom_id` `overlay-credit-probe-1`, model `claude-haiku-5-5`, `max_tokens` 16, prompt `Reply BATCH_PROBE_OK only.`. The key was loaded by the developer from the credit instance's secret file, so it is the same key and workspace as requests 1 to 3.
+- Script `/tmp/phase0b-step5/batch_probe.py submit` (outside the repository; key read from the process environment, never printed; since deleted, see Batch reproduction), one request, `custom_id` `overlay-credit-probe-1`, model `claude-haiku-5-5`, `max_tokens` 16, prompt `Reply BATCH_PROBE_OK only.`. The key was loaded by the developer from the credit instance's secret file, so it is the same key and workspace as requests 1 to 3.
 - Response: HTTP 200, API request ID `req_011Cgaby9NXJQEFc8B2KsBRB`, batch `msgbatch_01Q2Yhq4YbYw6F69CjJB3Hyd`, created 2026-10-31T16:08:03.624Z, `in_progress`, expires 2026-11-01T16:08:03Z.
 - Readings before submission (16:05Z): US$99.95 / US$99.96 / Max session 1 percent (investigating session, see below) / weekly 0 percent.
 
@@ -216,3 +216,39 @@ for d in ('~/.claude_credit', '~/.claude'):
     print(d, os.path.exists(os.path.expanduser(d + '/.credentials.json')))
 EOF
 ```
+
+## Batch reproduction
+
+The original script is gone, and its `anthropic-version` value was not recorded. This self-contained recipe sends the recorded request body with the header value shown on the cited Message Batches page. The key comes from `ANTHROPIC_API_KEY` only and is never printed.
+
+**Submitting creates a new billed request** (under US$0.0001 at the recorded size) and returns a new batch ID. It needs the developer's authorization and is not needed to read the recorded result. `status` and `results` are read-only, one call each, with no polling. Results stay available for 29 days after creation, so the recorded batch `msgbatch_01Q2Yhq4YbYw6F69CjJB3Hyd` can be read back until about 2026-11-29 with the same key.
+
+```python
+#!/usr/bin/env python3 -I
+"""One-shot Message Batches probe. Key from ANTHROPIC_API_KEY only; never printed. No polling.
+submit SPENDS (under US$0.0001 at the recorded size). status and results are read-only and free."""
+import json, os, sys, urllib.request
+API = os.environ.get('PROBE_API_BASE', 'https://api.anthropic.com')
+BODY = {'requests': [{'custom_id': 'overlay-credit-probe-1', 'params': {
+    'model': 'claude-haiku-5-5', 'max_tokens': 16,
+    'messages': [{'role': 'user', 'content': 'Reply BATCH_PROBE_OK only.'}]}}]}
+def call(method, path, body=None):
+    request = urllib.request.Request(API + path, method=method, data=None if body is None else json.dumps(body).encode(), headers={
+        'x-api-key': os.environ['ANTHROPIC_API_KEY'], 'anthropic-version': '2023-06-01', 'content-type': 'application/json'})
+    with urllib.request.urlopen(request) as response:
+        print('HTTP', response.status, 'request-id', response.headers.get('request-id'))
+        print(response.read().decode())
+match sys.argv[1:]:
+    case ['submit']: call('POST', '/v1/messages/batches', BODY)
+    case ['status', batch]: call('GET', f'/v1/messages/batches/{batch}')
+    case ['results', batch]: call('GET', f'/v1/messages/batches/{batch}/results')
+    case _: sys.exit('usage: batch_probe.py submit | status <id> | results <id>')
+```
+
+```sh
+python3 -I batch_probe.py submit            # billed; prints the batch ID
+python3 -I batch_probe.py status <batch-id> # read-only; wait for processing_status "ended"
+python3 -I batch_probe.py results <batch-id> # read-only; one JSON line per request
+```
+
+Checked on 2026-11-02 against a local stub through `PROBE_API_BASE`: all three modes sent the expected method, path, header names and body. No request went to the API, so the recorded results above are unchanged and this check is not new billing evidence.

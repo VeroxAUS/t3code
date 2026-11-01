@@ -354,7 +354,7 @@ it.effect(
       yield* setup;
       const weak = route("weak", "claudeAgent");
       const strong = route("strong");
-      const otherAttempt = route("weak-next", "claudeAgent");
+      const otherAttempt = { ...route("weak-next", "claudeAgent"), runId: weak.runId };
       const otherNativeThread = {
         ...strong,
         providerThreadId: ProviderThreadId.make("provider-thread:second-native-session"),
@@ -385,6 +385,8 @@ it.effect(
         [1, 1, 1, 1],
       );
       assert.equal(state.rows.filter((row) => row.native_ref_json === null).length, 1);
+      // A (runId, ordinal) key would collapse these two turns into one row.
+      assert.equal(state.rows.filter((row) => row.run_id === weak.runId).length, 2);
       assert.equal(
         state.rows.find((row) => row.provider_turn_id === weak.providerTurnId)!.input_tokens,
         110,

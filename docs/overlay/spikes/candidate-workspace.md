@@ -2,7 +2,7 @@
 
 Baseline: `a1ec007be82fdc4156be3db73d226d29a62ea083` on `overlay/phase-0b-step-4`, the merged step-3 revision and current `origin/overlay/main` at investigation start. Investigation: 2026-10-31 Australia/Sydney. Documentation only; no production workspace implementation changes.
 
-**A fresh T3 worktree launched from the full candidate SHA contains that candidate, without the writer's dirty files or later commit. Attaching an existing worktree retains its actual HEAD and dirt.** The writer's HEAD, index, statuses, file contents and hashes were unchanged after both probes. No setup files appeared: this instance's effective script selection was empty, despite the scripts stored in the disposable project. Successful setup execution is not claimed.
+**A fresh T3 worktree launched from the full candidate SHA contains that candidate, without the writer's dirty files or later commit. Attaching an existing worktree retains its actual HEAD and dirt.** The writer's HEAD, index, statuses, file contents and hashes were unchanged after both probes. No setup files appeared in those probes because this instance's effective script selection was empty, despite the scripts stored in the disposable project. A 2026-11-02 rerun with the script effective ran it in both checkouts: the fresh candidate gained only the two declared outputs, and the attached checkout was changed by setup. See [Setup effects with an effective script](#setup-effects-with-an-effective-script-2026-11-02).
 
 ## Environment and fixture
 
@@ -10,7 +10,7 @@ Baseline: `a1ec007be82fdc4156be3db73d226d29a62ea083` on `overlay/phase-0b-step-4
 
 The developer restarted the retained isolated home with `vp run dev --no-seed` and reused coordinator `8bb7473a-f5c0-4b5e-87b0-17d717454e45` in project `/tmp/t3-permission-probes`. The investigator started/stopped no server, used no browser/computer and did not access the live T3 install. The two probe threads inherited `full-access/default` and selected `codex/gpt-6-luna`, but remained idle with zero runs and no active provider thread; no provider execution or native cwd claim follows from that selection.
 
-The disposable repository is `/tmp/phase0b-step4-20261031/writer`, with a separately prepared linked checkout at `/tmp/phase0b-step4-20261031/existing`. These are fixture repositories, not checkouts of the contributor's T3 repository. Initial captures and the manifest were saved in `/tmp/phase0b-step4-20261031/evidence`; see Cleanup for their final archive location. Preparation and capture helpers were `/tmp/phase0b-step4-prepare.py` and `/tmp/phase0b-step4-capture.py`; no helpers are added to production code.
+The disposable repository is `/tmp/phase0b-step4-20261031/writer`, with a separately prepared linked checkout at `/tmp/phase0b-step4-20261031/existing`. These are fixture repositories, not checkouts of the contributor's T3 repository. Initial captures and the manifest were saved in `/tmp/phase0b-step4-20261031/evidence`; see Cleanup for their final archive location. Preparation and capture helpers were `/tmp/phase0b-step4-prepare.py` and `/tmp/phase0b-step4-capture.py`; no helpers are added to production code. Those helpers and their archive no longer exist, so [Reproducing the probe](#reproducing-the-probe) gives self-contained replacements.
 
 `python3 /tmp/phase0b-step4-prepare.py` created a base, candidate, then a later writer commit, before dirtying the writer. `git -C /tmp/phase0b-step4-20261031/writer log --all --oneline --decorate` returned:
 
@@ -206,7 +206,29 @@ The committed `.gitignore` ignores `writer-ignored.txt`, `existing-ignored.txt` 
 
 Selective, read-only extraction from the isolated `settings.json` found `projectSettingsFolded: true`, an omitted `defaultProjectScripts` field (decoded default `[]`), and no `projectSettingsOverrides[<probe projectId>].defaultProjectScripts`. [resolveProjectScripts](../../../packages/shared/src/projectScripts.ts) returns the default scripts in this folded state, ignoring the project's stored `scripts` when no project override exists. [ProjectSetupScriptRunner](../../../apps/server/src/project/ProjectSetupScriptRunner.ts) uses that resolver and returns `no-script` when none is selected. **Inference from source plus captured settings:** the effective setup stage was skipped. The MCP thread read exposes no setup-stage result, so idle status alone was not used as proof of setup completion. Stored project scripts are not evidence that those scripts executed.
 
-This investigation did not change the environment settings or fix that adjacent project-script behavior. Positive setup execution and output provenance remain untested; the demonstrated launch results have zero setup-created files to separate from Git content. For a future verifier whose effective script list is nonempty, capture script completion and inspect its outputs independently before accepting a candidate-tree comparison.
+This first investigation did not change the environment settings or fix that adjacent project-script behavior, and its launches have zero setup-created files to separate from Git content.
+
+## Setup effects with an effective script (2026-11-02)
+
+Baseline `d998e4e66e` on `overlay/phase-0b-fix`, Node v26.12.1, the same isolated home, started with `vp run dev:server --no-seed`. This thread drove the server directly with the helpers below, with no coordinator or browser. A new disposable fixture has base `889b821daf5b712e3c1ba7100de16418e938ef80`, candidate `917cb9afd4fa35ea1b3d9a27388e21302025e159` and writer HEAD `dc1b61ae04e73badf719dbd774cc972ff5a3326f`. Project `mcp:2f82c72c-ae69-450d-9fdc-f699ac01242b` got `projectSettingsOverrides[<project>].defaultProjectScripts`, containing the script from the project request above. The fresh launch requested `p0bfix-fresh-candidate` and the existing launch attached to `<root>/existing`; both requests otherwise match the JSON above and omit `message`.
+
+| Observation        | Fresh candidate                                                                                                               | Existing attachment                                                                                           |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| HEAD               | Candidate SHA                                                                                                                 | Base, unchanged                                                                                               |
+| Git content        | All 6 tracked files byte-match `git show <candidate>:<path>`; `git diff` and `git diff --cached` against the candidate exit 0 | Index unchanged; the earlier dirty and ignored files are byte-identical                                       |
+| `status --ignored` | `?? setup-created.txt`, `!! setup-ignored.txt` only                                                                           | Earlier `tracked.txt`, `existing-untracked.txt` and `existing-ignored.txt` entries, plus the same two outputs |
+| Output contents    | Both `setup:<that checkout's path>\n`                                                                                         | Both `setup:<that checkout's path>\n`                                                                         |
+| Terminal log       | Wrapped command, the script's output line, then `__T3_SETUP_DONE___<id>:0`                                                    | Bare `node setup.cjs` and its output line; **no completion sentinel**, so exit status was not observed        |
+
+Provider spend was zero. Both threads were idle with zero runs and empty `items`, the event log holds only `thread.created` and `thread.metadata-updated` for them (3908-3911), and `~/.claude_credit` kept its 4 transcripts. Neither `t3_thread_read` nor a persisted event exposes the setup result; the evidence is the outputs and `.t3/userdata/logs/terminals/`. The writer's snapshot digest was `fb92520246955836c9ac08d8f9ac77a792db074c282d74f1727d6dfbe10c45fa` before the launches, after both, and after cleanup.
+
+What this adds for a verifier:
+
+- A fresh candidate worktree runs the effective setup script. Comparing tracked files against the candidate still holds, and setup's own outputs appear as untracked or ignored files that must be declared.
+- Attaching `existing_worktree` runs the same script in that checkout and changes it. This is a further reason attachment is not a verifier path, and on this path no sentinel records completion.
+- Only a successful, synchronous, well-behaved script was exercised. Failing, async and hostile setup scripts remain untested, and so does setup's effect on a later provider turn.
+
+Cleanup: `t3_project_delete` with `force: true` produced events 3912-3914, both linked worktrees were removed, the server was stopped by its port owner's process group after confirming its cwd was this worktree, and `settings.json` was restored to its original bytes (SHA-256 `099757f6137c39c08b0c8caa9fc805471c7aca7bf213b19edee93ebead301b00`). All 3,515 events up to sequence 3904 match the pre-probe backup by count and maximum sequence, and the sequences this spike and its siblings cite still exist.
 
 ## Source contract and limits
 
@@ -218,7 +240,7 @@ This investigation did not change the environment settings or fix that adjacent 
 
 ## Verifier recipe pinned to the candidate
 
-1. Record the immutable candidate SHA and writer's before state. For this fixture the SHA is `921fe73a6d7173e4d57614718a95084dc8b663b3`; before cleanup, `git -C /tmp/phase0b-step4-20261031/writer cat-file -t 921fe73a6d7173e4d57614718a95084dc8b663b3` must print `commit`. After cleanup, recover the exact commits with `git clone /tmp/phase0b-step4-evidence-20261031/candidate-workspace.bundle <new-disposable-writer>`; the dirty states are retained as snapshots, not committed in the bundle. Register the new path as a new project and use the newly returned project ID. Use a new evidence directory; do not overwrite these snapshots or attach a verifier to the writer.
+1. Record the immutable candidate SHA and writer's before state. For this fixture the SHA is `921fe73a6d7173e4d57614718a95084dc8b663b3`; that fixture and its bundle are gone, so build a new one with [Reproducing the probe](#reproducing-the-probe) and use its printed SHA in the steps below. Register the new path as a new project and use the newly returned project ID. Use a new evidence directory; do not attach a verifier to the writer.
 2. Use the fresh `t3_thread_launch` JSON above with the registered disposable project ID, the full SHA in `baseRef`, `startFromOrigin: false`, and a branch unique to that probe. Capture the entire response. Use `t3_thread_read` for the returned ID and record its actual `worktreePath` and branch. Inspect the effective script list: for these captured settings it was empty. When a setup script is selected, establish its completion before accepting files or starting a verifier turn. An idle thread's `runId: null` does not itself establish setup completion.
 3. Set `verifier_path` only to that returned path, then check:
 
@@ -229,11 +251,135 @@ This investigation did not change the environment settings or fix that adjacent 
    git -C "$verifier_path" status --short --untracked-files=all --ignored
    ```
 
-   For the observed empty script selection, require empty status and no extra files, including no setup outputs. If the probe's setup script is deliberately made effective in a separate investigation, only its two declared outputs may be added: `?? setup-created.txt` and `!! setup-ignored.txt`, both containing exactly `setup:<actual verifier path>\n`. `tracked.txt` must contain `candidate:tracked\n`; `staged.txt` must contain `base:staged\n`; `candidate-only.txt` must exist; all writer/existing-only sentinels must be absent. Compare every tracked file's bytes against `git show <candidate>:<path>` and also check `git diff --cached --exit-code "$candidate_sha" --` for index changes.
+   For the observed empty script selection, require empty status and no extra files, including no setup outputs. When the probe's setup script is effective, as in the 2026-11-02 section, only its two declared outputs may be added: `?? setup-created.txt` and `!! setup-ignored.txt`, both containing exactly `setup:<actual verifier path>\n`. `tracked.txt` must contain `candidate:tracked\n`; `staged.txt` must contain `base:staged\n`; `candidate-only.txt` must exist; all writer/existing-only sentinels must be absent. Compare every tracked file's bytes against `git show <candidate>:<path>` and also check `git diff --cached --exit-code "$candidate_sha" --` for index changes.
 
 4. Run the verification commands in the bound checkout, keep generated artifacts separate from candidate source changes, and record the actual SHA again with the results. Do not treat checkout isolation as a read-only enforcement guarantee. The fixture's acceptance commands are the SHA, tracked-tree and sentinel checks; a real project's verifier also receives that project's specified test command.
 5. Capture the writer again. Compare HEAD, index, both statuses, file contents and hashes against the before capture. For this fixture the helpers produce JSON files directly comparable with `cmp`; any difference fails the writer-preservation check. Separately run the `existing_worktree` probe and report its actual HEAD and retained dirt. It has no candidate-reset input and is not an alternative to step 2.
 6. Save launch responses, bound paths and setup evidence before deleting the disposable threads/project and removing only the linked worktrees created by the probe. Preserve captures outside those worktrees. Never reset or clean the writer or the contributor checkout to make the comparison pass.
+
+## Reproducing the probe
+
+The original helpers, the archive and its bundle are gone, so the 17 archive hashes and the digest `588b34e7…` cannot be recomputed. A new fixture has the same shape but new SHAs and digests, because commit times differ: compare a run against its own before captures, not against values recorded here. No model is called as long as launches omit `message`.
+
+Keep these two files in an empty directory outside the repository, alongside `ln -s <repo>/apps/server/node_modules node_modules`. Fixture and capture helper:
+
+```python
+#!/usr/bin/env python3 -I
+"""Disposable fixture for the candidate-workspace probe, and an exclusive capture helper. No repository helper needed.
+prepare <root>                 creates <root>/writer and linked <root>/existing, prints the three SHAs.
+capture <evidence> <name> <dir> writes <evidence>/<name>.json and prints its SHA-256; refuses to overwrite."""
+import hashlib, json, pathlib, subprocess, sys
+def git(cwd, *args):
+    return subprocess.run(['git', '-C', str(cwd), *args], check=True, capture_output=True, text=True).stdout
+def write(root, name, text):
+    (pathlib.Path(root) / name).write_text(text)
+SETUP = '''const fs = require("node:fs");
+for (const file of ["setup-created.txt", "setup-ignored.txt"])
+  fs.writeFileSync(file, "setup:" + process.cwd() + "\\n");
+console.log("candidate-probe-setup:" + process.cwd());
+'''
+def prepare(root):
+    root = pathlib.Path(root); writer = root / 'writer'; existing = root / 'existing'
+    writer.mkdir(parents=True)
+    git(writer, 'init', '-q', '-b', 'writer')
+    git(writer, 'config', 'user.name', 'probe'); git(writer, 'config', 'user.email', 'probe@example.invalid')
+    write(writer, '.gitignore', 'writer-ignored.txt\nexisting-ignored.txt\nsetup-ignored.txt\n')
+    write(writer, 'setup.cjs', SETUP)
+    write(writer, 't3.json', json.dumps({'scripts': [{'name': 'Candidate probe setup', 'command': 'node setup.cjs',
+                                                      'icon': 'configure', 'runOnWorktreeCreate': True}]}, indent=2) + '\n')
+    write(writer, 'tracked.txt', 'base:tracked\n'); write(writer, 'staged.txt', 'base:staged\n')
+    git(writer, 'add', '-A'); git(writer, 'commit', '-qm', 'probe: base')
+    base = git(writer, 'rev-parse', 'HEAD').strip()
+    git(writer, 'branch', 'existing-probe')
+    write(writer, 'tracked.txt', 'candidate:tracked\n'); write(writer, 'candidate-only.txt', 'candidate:only\n')
+    git(writer, 'add', '-A'); git(writer, 'commit', '-qm', 'probe: candidate')
+    candidate = git(writer, 'rev-parse', 'HEAD').strip()
+    git(writer, 'branch', 'candidate')
+    write(writer, 'writer-commit-only.txt', 'writer:later-commit\n')
+    git(writer, 'add', '-A'); git(writer, 'commit', '-qm', 'probe: writer advances beyond candidate')
+    head = git(writer, 'rev-parse', 'HEAD').strip()
+    git(writer, 'worktree', 'add', '-q', str(existing), 'existing-probe')
+    write(writer, 'staged.txt', 'writer:staged\n'); git(writer, 'add', 'staged.txt')
+    write(writer, 'tracked.txt', 'writer:unstaged\n')
+    write(writer, 'writer-untracked.txt', 'writer:untracked\n'); write(writer, 'writer-ignored.txt', 'writer:ignored\n')
+    write(existing, 'tracked.txt', 'existing:unstaged\n')
+    write(existing, 'existing-untracked.txt', 'existing:untracked\n'); write(existing, 'existing-ignored.txt', 'existing:ignored\n')
+    print(json.dumps({'base': base, 'candidate': candidate, 'writerHead': head}))
+def capture(evidence, name, directory):
+    directory = pathlib.Path(directory)
+    files = {}
+    for path in sorted(directory.rglob('*')):
+        if path.is_file() and '.git' not in path.relative_to(directory).parts:
+            data = path.read_bytes()
+            files[str(path.relative_to(directory))] = {'content': data.decode(), 'sha256': hashlib.sha256(data).hexdigest()}
+    snapshot = {'head': git(directory, 'rev-parse', 'HEAD').strip(), 'index': git(directory, 'ls-files', '--stage'),
+                'status': git(directory, 'status', '--short', '--untracked-files=all'),
+                'statusIgnored': git(directory, 'status', '--short', '--untracked-files=all', '--ignored'), 'files': files}
+    body = json.dumps(snapshot, sort_keys=True, separators=(',', ':')).encode()
+    with open(pathlib.Path(evidence) / f'{name}.json', 'xb') as out: out.write(body)
+    print(name, hashlib.sha256(body).hexdigest())
+    return snapshot
+if sys.argv[1] == 'prepare': prepare(sys.argv[2])
+else: capture(sys.argv[2], sys.argv[3], sys.argv[4])
+```
+
+MCP call helper, which signs in as `t3 thread` does because that command always sends a message:
+
+```ts
+// One MCP tool call against the running server, signing in the way `t3 thread` does; the session is revoked on exit.
+// Usage: node t3_mcp_call.ts <repo> <T3 home> <tool> '<json args>'
+import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
+import * as NodeServices from "@effect/platform-node/NodeServices";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
+import * as Option from "effect/Option";
+const [repo, home, tool, args] = process.argv.slice(2) as [string, string, string, string];
+const src = `${repo}/apps/server/src`;
+const { resolveCliAuthConfig } = await import(`${src}/cli/config.ts`);
+const EnvironmentAuth = await import(`${src}/auth/EnvironmentAuth.ts`);
+const ServerConfig = await import(`${src}/config.ts`);
+const { readPersistedServerRuntimeState } = await import(`${src}/serverRuntimeState.ts`);
+const { mcpToolSession } = await import(`${src}/mcp/AcpMcpStdioBridge.ts`);
+const NetService = await import(`${repo}/packages/shared/src/Net.ts`);
+const program = Effect.gen(function* () {
+  const config = yield* resolveCliAuthConfig({ baseDir: Option.some(home) }, Option.none());
+  return yield* Effect.gen(function* () {
+    const state = yield* readPersistedServerRuntimeState(config.serverRuntimeStatePath);
+    const origin = Option.getOrThrow(state).origin;
+    const auth = yield* EnvironmentAuth.EnvironmentAuth;
+    const issued = yield* Effect.acquireRelease(
+      auth.issueMcpClientSession({
+        label: "phase0b probe",
+        access: "full-access",
+        client: { deviceType: "bot" },
+      }),
+      (session: { sessionId: string }) => auth.revokeSession(session.sessionId).pipe(Effect.ignore),
+    );
+    const session = yield* mcpToolSession({
+      endpoint: new URL("/mcp", origin).href,
+      authorization: `Bearer ${issued.token}`,
+      clientName: "phase0b-probe",
+    });
+    console.log(JSON.stringify(yield* session.call(tool, JSON.parse(args))));
+  }).pipe(
+    Effect.scoped,
+    Effect.provide(EnvironmentAuth.layerRuntime.pipe(Layer.provide(ServerConfig.layer(config)))),
+  );
+});
+NodeRuntime.runMain(
+  program.pipe(Effect.provide(Layer.mergeAll(NodeServices.layer, NetService.layer))),
+);
+```
+
+Sequence, from that directory, against an isolated home only:
+
+1. `python3 -I candidate_fixture.py prepare <root>`, then `capture <evidence> writer-before <root>/writer` and `capture <evidence> existing-before <root>/existing`.
+2. Copy `<repo>/.t3/userdata/settings.json` aside. Start the server with `setsid vp run dev:server --no-seed` from the repository, and record its group from the port owner.
+3. `node t3_mcp_call.ts <repo> <repo>/.t3 t3_project_create '<project JSON above, with this workspaceRoot>'`. Stop the server.
+4. For positive setup, set `projectSettingsOverrides["<project id>"].defaultProjectScripts` to the same script list. Omit this step to reproduce the empty selection. Start the server again; a restart makes the setting's effect unambiguous.
+5. Call `t3_thread_launch` with the two workspace strategies above, using a new branch name and the printed candidate SHA.
+6. Wait for `setup-ignored.txt` in each checkout, or for a bounded time if setup is off. `capture` the fresh worktree, the existing checkout and the writer, then run the checks in the recipe above and read `.t3/userdata/logs/terminals/`.
+7. Call `t3_project_delete` with `force: true`, then `git -C <root>/writer worktree remove --force` on each linked path. Stop the server and restore the settings copy.
 
 ## Focused checks
 
@@ -272,7 +418,7 @@ git -C /tmp/phase0b-step4-20261031/writer worktree remove --force /tmp/phase0b-s
 
 Result: bundle verified with complete history, fresh worktree removed, dirty fixture attachment removed after its contents were captured, and the fixture's worktree list contained only its disposable writer. The helper then archived the evidence and removed that fixture repository. It did not reset or clean the writer to make a preservation assertion pass. Both linked checkout paths and `/tmp/phase0b-step4-20261031` are now absent. The contributor's checkout, developer-owned coordinator/project, server and prior-step histories remain intact. No process was started or stopped by the implementation session.
 
-Final local archive: **`/tmp/phase0b-step4-evidence-20261031`**. It contains the original snapshots (including the two failed setup assertions' captures), raw coordinator and cleanup calls, independent verification, the verified Git bundle, preparation/capture/verification/cleanup helpers, final writer comparison and `sha256.json`. It is outside the contributor repository and may be lost on reboot; the committed evidence above is the durable record. The original helper commands describe the pre-cleanup capture and are not expected to rerun against deleted resources.
+Final local archive: **`/tmp/phase0b-step4-evidence-20261031`**. It contains the original snapshots (including the two failed setup assertions' captures), raw coordinator and cleanup calls, independent verification, the verified Git bundle, preparation/capture/verification/cleanup helpers, final writer comparison and `sha256.json`. It was outside the contributor repository and no longer exists (checked 2026-11-02); the committed evidence above is the durable record. The original helper commands describe the pre-cleanup capture and are not expected to rerun against deleted resources.
 
 Post-archive validation loaded `sha256.json` and compared each listed file with `hashlib.sha256(path.read_bytes()).hexdigest()` → **17 archived files match**, and both deleted checkout paths and the fixture root were absent.
 
