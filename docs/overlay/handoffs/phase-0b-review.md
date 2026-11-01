@@ -61,16 +61,19 @@ For the second thread, not findings of this review:
 
 ## Developer actions
 
-- Restore the required check on `overlay/main`, unless its removal was deliberate. Read the current settings first because `PUT` replaces them all: `gh api repos/VeroxAUS/t3code/branches/overlay%2Fmain/protection`. Then reuse the `PUT` in `docs/overlay/handoffs/phase-0-step-6.md:45-60`, carrying over everything else that read shows. Record `required_status_checks.checks` in the fix thread. If removal was deliberate, record it in `decisions.md` and correct `10-execution-plan.md:45`.
+- Restore the required check on `overlay/main`. Read the current settings first because `PUT` replaces them all: `gh api repos/VeroxAUS/t3code/branches/overlay%2Fmain/protection`. Then reuse the `PUT` in `docs/overlay/handoffs/phase-0-step-6.md:45-60`, carrying over everything else that read shows. Record `required_status_checks.checks` in the fix thread.
 - Merge this PR when satisfied; the agent never merges.
 
 ## Open questions for the developer
 
 - Was removing `overlay-check` from the required checks on `overlay/main` deliberate?
   Recommended: treat it as unintended and restore it — no decision records it, and the inbox's 2026-10-31 recovery item says the check should stay required.
+  Answer: the developer believes it was dropped because of a problem with the check during a docs-only step, and it should be required as normal. A re-read on 2026-11-02 after this answer still returned `required_status_checks` absent, so the restore below is still owed.
 - Finding 2: probe Antigravity's advertised modes, or defer it?
   Recommended: probe — it needs no model turn, and the Phase 1/2 role decision needs to know whether T3 plan is a native mode on Antigravity.
+  Answer: probe.
 - Finding 3: run the setup-script probe, or defer it?
   Recommended: probe — it costs no provider spend, and Phase 4's verifier depends on setup running in candidate checkouts.
+  Answer: probe.
 
 Next: Run docs/overlay/prompts/_fix.md for phase 0b with handoff docs/overlay/handoffs/phase-0b-review.md — on GPT-6.1 Sol high
