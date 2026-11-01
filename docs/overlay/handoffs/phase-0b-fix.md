@@ -32,7 +32,7 @@ Branch `overlay/phase-0b-fix` · worktree `/home/verox/src/t3code-phase-0`. This
 - `node scripts/overlay-check.ts --base origin/overlay/main` → pass. No upstream path changed, so no manifest line was due.
 - `gh api repos/VeroxAUS/t3code/branches/overlay%2Fmain/protection --jq '{required_status_checks:(.required_status_checks // "ABSENT")}'` → `strict: true`, `checks: [{context: "overlay-check", app_id: 15368}]`. This records review finding 1's resolution; this thread changed no settings.
 - Isolated state after the probes: no probe server or `agy_acp_server` process remains, `settings.json` matches its original SHA-256 `099757f6…`, and events up to 3904 match the pre-probe backup by count and maximum sequence.
-- PR: PR_URL_PLACEHOLDER, open and not merged. CI completion is not claimed.
+- PR: https://github.com/VeroxAUS/t3code/pull/27, open and not merged. CI completion is not claimed.
 
 ## Not done / deferred
 
