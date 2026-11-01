@@ -2,6 +2,8 @@
 
 One line per change queued by an `_ask.md` thread. The next design round clears it.
 
+- 2026-11-01: Phase 1/2 design round: settle role enforcement given decision 32 (plan mode is prompt-level; Codex `readOnly` is OS-enforced; Claude `approval-required/plan` shell writes ran unprompted, hypothesis user `defaultMode: auto` and `useAutoModeDuringPlan`; Codex `workspaceWrite` is not a workspace boundary), and decide whether T3 should pin Claude's permission settings for role children (from: step 3 permission supplement).
+
 - 2026-10-31: Record support ticket #4927935's confirmation that the 03:17 UTC schedule is registered and native cron delivery may be delayed or dropped, retire the unregistered-schedule hypothesis, and adopt the developer-approved external scheduler route using overlay-sync.yml's existing workflow_dispatch trigger against overlay/main; the next design round selects the scheduler, credential setup and native-cron disposition, with an actual externally dispatched run as acceptance evidence (from: GitHub support response; external scheduler approved).
 
 - 2026-10-30: Say in the step-1 developer action and prompt that the Antigravity install and Google sign-in happen in the isolated dev server the step-1 session drives (its own T3 home), not the live T3 install, and say who starts that server (from: what are the developer actions).
@@ -20,3 +22,4 @@ One line per change queued by an `_ask.md` thread. The next design round clears 
 - 2026-10-30: Bring the backlog up to date: mark #3 dropped under decision 3 and remove "capped overage" from `README.md:53`, mark #17 and #26 done, mark #1, #4, #6, #7, #8, #9, #10, #11 and #20 as already in the core plan so design rounds do not re-brief them, fold #31 into #21, restore #12 to Phase 4 or say why it stays in Phase 6, correct #9's phase, and brief #38 plus the queued research sweep and "Start here" ideas for a promote, defer or drop call (from: backlog review for design).
 
 - 2026-10-31: Make overlay-next stop before offering a merge when a required check is absent or unsuccessful instead of swallowing gh pr checks failures, and replace the stale pre-step-6 messaging with current branch-protection guidance (from: PR #23 blocked with no overlay-check run).
+- 2026-10-31: Add a workflow_dispatch recovery path for overlay-check with concurrency separated by PR or branch, and verify on a disposable PR that a manual run against its current head satisfies the existing required check without weakening branch protection (from: prevent another missing overlay-check blocker).
