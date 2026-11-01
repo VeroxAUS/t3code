@@ -14,6 +14,8 @@ None remaining in the reviewed fixes. The developer answered yes to leaving the 
 
 ## Done, verified
 
+- Review PR: [#28](https://github.com/VeroxAUS/t3code/pull/28), opened into `overlay/main`; not merged. `vp run check:changed origin/overlay/main` passed for this handoff before push. CI completion is not claimed.
+
 - `git fetch origin`, `gh pr view 27 --json state,mergeCommit,files,statusCheckRollup,url` and `git diff 7cfc9589^1 7cfc9589` establish the reviewed baseline. PR #27 is merged; its [overlay-check](https://github.com/VeroxAUS/t3code/actions/runs/41313916488/job/124869863944) succeeded. The fix changes documentation and the synthetic identity fixture, not production behavior.
 - `gh api repos/VeroxAUS/t3code/branches/overlay%2Fmain/protection --jq '.required_status_checks'` returns `strict: true`, `overlay-check`, app ID 15368. First review finding 1 remains resolved. No repository settings changed here.
 - Extracted the committed Codex Python probe to `/tmp/p0b-review2/codex_probe.py`; `python3 -I /tmp/p0b-review2/codex_probe.py` from the worktree and from `/home/verox` reproduces all nine operations in each context on codex-cli 0.166.0. `workspaceWrite` refuses the home-subfolder write from the worktree and permits it from home; `readOnly` refuses both writes and `dangerFullAccess` permits both. File hashes agree. Fresh targets/config directories were cleaned by the script. This closes Astra finding 1 without inferring a T3 confinement guarantee.
