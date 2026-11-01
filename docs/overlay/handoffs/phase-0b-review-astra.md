@@ -24,6 +24,7 @@ The scoped credit `go` is supported. The new permission observation on Claude is
 
 ## Done, verified
 
+- Review PR: `git push -u origin HEAD` and `gh pr create --repo VeroxAUS/t3code --base overlay/main --head overlay/phase-0b-review-astra` → [PR #26](https://github.com/VeroxAUS/t3code/pull/26), open; not merged. `vp run check:changed origin/overlay/main` → pass for this review handoff after formatting. CI completion is not claimed.
 - Gate and branch: `git fetch origin`, `git rev-parse HEAD origin/overlay/main`, then `git switch -c overlay/phase-0b-review-astra origin/overlay/main` → based on `b7e0d58bbaac7fa5bbe6c6d255d71c5bc6056878`, containing the first review and developer answers. Git metadata is outside the writable worktree; fetch/switch required escalation.
 - PR evidence: `gh pr view 24 --repo VeroxAUS/t3code --json files,mergeCommit,statusCheckRollup,url` and `git diff 25f0044^1 25f0044` → six overlay documentation files, no production code. Its [overlay-check run](https://github.com/VeroxAUS/t3code/actions/runs/41275289384/job/124756130949) succeeded. PRs #20–#23 retain the earlier review's assessment.
 - Required pricing test: `cd packages/routing && ../../node_modules/.bin/vp test run src/costs.test.ts` → **22 passed**.
