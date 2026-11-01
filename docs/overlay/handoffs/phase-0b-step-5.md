@@ -5,7 +5,7 @@ supersedes: docs/overlay/handoffs/phase-0b-step-4.md
 
 ## Where we are
 
-Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` · based on `origin/overlay/main` `6169024ecf` plus one inbox-only commit (`8fd48a9684`). All four authorized paid requests ran and the developer's Usage-page CSV attributes each of them (reconciliation in the spike). The verdict is `go`, scoped to Haiku 5.5 and Sonnet 5.5 thread turns without tools and `claude -p` text generation on `Claude Credit`; the developer confirms admission of the in-T3 credit steps (open question). One Haiku residual of 2,382 input and 44 output tokens in hour 14 is unexplained. Phase 0b is not declared passed here; only the review does that. PR: [#24](https://github.com/VeroxAUS/t3code/pull/24) into `overlay/main`, open. Never merge.
+Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` · based on `origin/overlay/main` `6169024ecf` plus one inbox-only commit (`8fd48a9684`). All four authorized paid requests ran and the developer's Usage-page CSV attributes each of them (reconciliation in the spike). The verdict is `go`, scoped to Haiku 5.5 and Sonnet 5.5 thread turns without tools and `claude -p` text generation on `Claude Credit`; the developer confirms admission of the in-T3 credit steps (open question). One Haiku residual of 2,382 input and 44 output tokens in hour 14 is unexplained. Phase 0b is not declared passed here; only the review does that. Step 3's plan-mode cells are explicitly deferred (decision 32). PR: [#24](https://github.com/VeroxAUS/t3code/pull/24) into `overlay/main`, open. Never merge.
 
 ## Done, verified
 
@@ -31,7 +31,7 @@ Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` ·
 - The 2,382 in / 44 out Haiku residual in hour 14: cause unverified (plausibly runtime-internal auxiliary calls not in the transcript), not separable between requests 1 and 2.
 - Exact per-request credit decrement: no source exists at this granularity; funding is inferred from consistency.
 - Process environment of the spawned credit-instance `claude` was not read; isolation rests on transcript locations.
-- Inherited and unresolved, not deferred by the developer: step 3's plan-mode write cells are now **attempted but not resolved** (three of four re-declined by the models; Claude approval-required/plan shell writes bypassed approval); native Antigravity plan-mode selection; positive setup-script execution; step 1's live cumulative/reset/steering/interrupted/reasoning/subagent behavior, OpenCode 2 and other ACP live coverage; step 2's concurrent rebuild, process-kill continuation and power-loss durability; step 4's read-only enforcement, provider-turn cwd, remote-only candidate, submodule, relay/client and hostile-setup coverage.
+- Deferred by the developer (decision 32): step 3's plan-mode write cells (attempted twice; the models declined; findings carried to Phase 1 design). Still unresolved and not deferred: native Antigravity plan-mode selection; positive setup-script execution; step 1's live cumulative/reset/steering/interrupted/reasoning/subagent behavior, OpenCode 2 and other ACP live coverage; step 2's concurrent rebuild, process-kill continuation and power-loss durability; step 4's read-only enforcement, provider-turn cwd, remote-only candidate, submodule, relay/client and hostile-setup coverage.
 
 ## Decisions made and why
 
@@ -50,7 +50,7 @@ Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` ·
 ## Developer actions
 
 - Re-enable `Claude Credit` text generation in the live install if you want it; it uses the same key and was disabled only for the probes.
-- Step 3: review the supplement in `permissions-map.md`. The model-free Codex probe settled that `readOnly` (T3's approval-required sandbox) blocks writes at the OS level; Claude has no model-free path, and its plan-mode cells stay untested at the tool layer (models declined). Either write a deferral accepting that, or ask for more repeats of the Claude approval-required/plan cell to check whether the unprompted shell writes reproduce (a no-cost repeat on the subscription instance); decide whether the shell-write finding and the `auto`-classifier hypothesis go to the Phase 1 design round.
+- Step 3: done by the developer on 2026-11-01 (decision 32): deferral of the plan-mode write cells and carried findings recorded; nothing further to do.
 - Sync: repeat the `gh run list` command above at the next daily slot and record any real scheduled run. Scheduler selection and any dispatch remain yours.
 - Review/merge the step-5 PR when satisfied; the agent never merges.
 

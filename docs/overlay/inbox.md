@@ -2,6 +2,8 @@
 
 One line per change queued by an `_ask.md` thread. The next design round clears it.
 
+- 2026-11-01: Phase 1/2 design round: settle role enforcement given decision 32 (plan mode is prompt-level; Codex `readOnly` is OS-enforced; Claude `approval-required/plan` shell writes ran unprompted, hypothesis user `defaultMode: auto` and `useAutoModeDuringPlan`; Codex `workspaceWrite` is not a workspace boundary), and decide whether T3 should pin Claude's permission settings for role children (from: step 3 permission supplement).
+
 - 2026-10-31: Record support ticket #4927935's confirmation that the 03:17 UTC schedule is registered and native cron delivery may be delayed or dropped, retire the unregistered-schedule hypothesis, and adopt the developer-approved external scheduler route using overlay-sync.yml's existing workflow_dispatch trigger against overlay/main; the next design round selects the scheduler, credential setup and native-cron disposition, with an actual externally dispatched run as acceptance evidence (from: GitHub support response; external scheduler approved).
 
 - 2026-10-30: Say in the step-1 developer action and prompt that the Antigravity install and Google sign-in happen in the isolated dev server the step-1 session drives (its own T3 home), not the live T3 install, and say who starts that server (from: what are the developer actions).
