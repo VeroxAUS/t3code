@@ -44,7 +44,7 @@ Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` ·
 - A UI-created thread auto-generates its title on the text-generation setting (`Claude Credit` Haiku), an unplanned paid request; MCP `t3_thread_launch` with an explicit `title` and no `generateTitle` does not. Initial title generation requires a `titleSeed` (`Orchestrator.ts`).
 - The Usage page is UTC with hourly buckets and lags a few hours; the Cost page is two-decimal and daily; Billing & payments (promotional credit) and the dashboard (Organization credits) differ by a cent. Record both with UTC times.
 - The investigating session's own subscription usage confounds the 5-hour Max window. A future billing probe needs a quiet subscription or a different signal.
-- The batch script is outside the repository (`/tmp/phase0b-step5/batch_probe.py`): key from the environment only, `submit` and `retrieve <id>` modes, no polling. Phase 1's digest script should be written and tested separately.
+- The batch script was a temporary file outside the repository (`/tmp/phase0b-step5/batch_probe.py`: key from the environment only, `submit` and `retrieve <id>` modes, no polling); `/tmp` was cleared afterwards and it no longer exists. Its request body is recorded in the spike. Phase 1's digest script should be written and tested separately.
 
 ## Developer actions
 
