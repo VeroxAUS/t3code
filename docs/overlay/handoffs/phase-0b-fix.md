@@ -43,6 +43,7 @@ Branch `overlay/phase-0b-fix` · worktree `/home/verox/src/t3code-phase-0`. This
 
 - No new developer decision. Decision 32's text is corrected only where review finding 1 named it, and its deferral is unchanged.
 - The fixture was tightened rather than only re-described, because a one-line change gives the prototype key a case that rule 1's fallback would collapse. It is labelled synthetic: no live data shows that shape.
+- At the developer's request, the inbox's role-enforcement line also carries the Antigravity and `existing_worktree` setup results, so the Phase 1/2 design round sees them. No finding named this.
 - The batch recipe uses `anthropic-version: 2023-06-01`, the value on the cited vendor page. The original script's value was not recorded.
 
 ## Gotchas
