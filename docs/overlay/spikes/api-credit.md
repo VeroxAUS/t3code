@@ -1,6 +1,6 @@
 # API-credit billing spike (#37)
 
-**Status: all four authorized paid requests ran on 2026-10-31 (14:06 to 16:08Z); per-request attribution awaits the developer's Usage-page hourly rows. In-T3 credit routing: `no-go: inconclusive` (gate closed). Separate batch result: the Haiku batch request succeeded at the batch tier; its funding source awaits the same rows.**
+**Status: complete. In-T3 credit routing for Haiku 5.5 and Sonnet 5.5 thread turns and `claude -p` text generation: `go` (scoped, see Verdict). Separate batch result: the Haiku batch succeeded at the batch tier and appears in the Console under the same workspace and key; the external digest still needs its own scheduled-run evidence in Phase 1.**
 
 Baseline: `8fd48a96846121c5cf8723ee196c4dc24a4ea03e` on `overlay/phase-0b-step-5` (current `origin/overlay/main` is `6169024ecf`, the step-4 merge; the branch adds one inbox-only commit). Preparation date: 2026-10-31. Runtimes: Claude Code 2.1.316 on PATH, 2.1.312 reported by the `Claude Credit` instance cache; Node v26.12.1; vp 1.4.0. The developer authorized the proposed sequence on 2026-10-31 and the four requests ran as scheduled below; each request's evidence is in the probe log, with arithmetic labelled separately from measurements.
 
@@ -111,7 +111,7 @@ All times UTC, 2026-10-31. Readings are developer-supplied: Billing & payments p
 - Persisted turn and native transcript (credit config directory) agree: model `claude-sonnet-5-5`, `standard` tier, uncached input 2, cache read 13,066, cache write 8,077 (all 5-minute bucket), output 15. No title-related event after 14:00Z.
 - API-equivalent arithmetic (not a measured charge): 2 x $2 + 13,066 x $0.10 + 8,077 x $2.50 + 15 x $10 per million = about US$0.02165. Cumulative with request 1 since the 14:00Z baseline: about US$0.02290.
 - Readings at 14:09Z: Billing & payments US$99.95 (baseline 99.98, change -0.03); dashboard US$99.96 (baseline 99.99, change -0.03); Max session 0 percent; weekly 0 percent.
-- Reading: the credit balance fell on both pages while the Max window stayed at 0 percent, after requests that ran only under the credit instance and with the live install's `Claude Credit` text generation disabled. A displayed fall of 3 cents against an arithmetic 2.29 cents is within one cent of display quantization (a floored or rounded cent display can turn 2.29 cents into 2 or 3 displayed cents depending on the starting fraction), so it neither confirms the arithmetic nor contradicts it. The Max window not moving at this size is a weak negative on its own. Attribution to request 2 rather than request 1 is not claimed: the 14:07Z reading after request 1 alone showed no change, and the later fall is cumulative. Hourly Usage-page rows are still needed to separate the two by model.
+- Reading: the credit balance fell on both pages while the Max window stayed at 0 percent, after requests that ran only under the credit instance and with the live install's `Claude Credit` text generation disabled. A displayed fall of 3 cents against an arithmetic 2.29 cents is within one cent of display quantization (a floored or rounded cent display can turn 2.29 cents into 2 or 3 displayed cents depending on the starting fraction), so it neither confirms the arithmetic nor contradicts it. Attribution to request 2 rather than request 1 is not claimed: the 14:07Z reading after request 1 alone showed no change, and the later fall is cumulative. The Usage-page rows later separated the two by model; see the reconciliation section.
 
 ### Request 3: title regeneration (text generation on `Claude Credit` Haiku 5.5, effort low)
 
@@ -127,39 +127,78 @@ All times UTC, 2026-10-31. Readings are developer-supplied: Billing & payments p
 - Readings before submission (16:05Z): US$99.95 / US$99.96 / Max session 1 percent (investigating session, see below) / weekly 0 percent.
 
 - Retrieval (one status call plus one results call, run by the developer): HTTP 200 on both, API request IDs `req_011CgacWXYsqxyzTVJuJgB9H` and `req_011CgacWZir6TFnJg4VF9VD8`. The batch `ended` at 2026-10-31T16:09:38.759Z, 95 seconds after creation, with 1 succeeded, 0 errored. Result for `overlay-credit-probe-1`: `succeeded`, model `claude-haiku-5-5`, message `msg_011Cgac4HLPprYrzLGvsx1jr`, text `BATCH_PROBE_OK`, `service_tier` `batch`, input 25, output 14, no cache tokens, no thinking tokens.
-- API-equivalent arithmetic (not a measured charge): at batch rates, 25 x $0.05 + 14 x $0.25 per million = US$0.00000475; at Haiku 5.5 standard rates the same tokens are 25 x $0.10 + 14 x $0.50 = US$0.0000095. The documented batch rate is exactly half the standard rate, so the discount is **verified in the documented rate table and in the response's `service_tier` `batch`, not measured as a charge**: a charge of under a thousandth of a cent cannot appear on a cent-rounded balance. Whether the credit funded it is still pending the Usage page.
+- API-equivalent arithmetic (not a measured charge): at batch rates, 25 x $0.05 + 14 x $0.25 per million = US$0.00000475; at Haiku 5.5 standard rates the same tokens are 25 x $0.10 + 14 x $0.50 = US$0.0000095. The documented batch rate is exactly half the standard rate, so the discount is **verified in the documented rate table and in the response's `service_tier` `batch`, not measured as a charge**: a charge of under a thousandth of a cent cannot appear on a cent-rounded balance. The Usage-page row later confirmed it as batch-tier usage under the same workspace and key; see the reconciliation section.
 
 ### Max-window confound (recorded 16:05Z)
 
 Reading at 16:05Z: Billing & payments US$99.95, dashboard US$99.96, Max session **1 percent**, weekly 0 percent. The session moved from 0 to 1 percent between 15:07Z and 16:05Z. The investigating Claude Code session itself runs on the Max subscription: its transcript shows 37 model calls since 14:00Z, the last at 16:03Z, with about 29,800 output tokens at large cached contexts, and T3's cached reader shows the current 5-hour window ending 18:59:59Z, meaning it opened at 14:00Z or soon after, when that session resumed. The developer reports no other Max use after 15:05Z (earlier work was on Codex) and states they are certain the 1 percent is the investigating Claude Code session's own usage; that attribution is the developer's, supported by the transcript counts above but not independently measurable. The 1 percent is therefore **not evidence that `Claude Credit` requests draw on the Max window**, and its absence at 0 percent is not evidence that they do not. The probes themselves ran at 14:06, 14:08 and 15:05Z with immediate readings of 0 percent. The Max window therefore cannot separate the probes from the investigating session and is **not usable as a billing-source test** here. Attribution rests on the Usage page's hourly rows by model and on funding-source reasoning, not on the Max window.
 
+## Usage-page reconciliation (developer-supplied CSV, received 2026-11-01)
+
+The export has no header row; the columns below were inferred by matching every row to the captures above, and the match is exact for all but one cell. Per hour (UTC), model, workspace, key name, service tier, context bucket, then token counts. Verbatim:
+
+```
+2026-10-31 14:00,claude-haiku-5-5,t3-overlay,t3-overlay,standard,≤ 200k,2384,8900,0,13066,59,0,global,standard
+2026-10-31 14:00,claude-sonnet-5-5,t3-overlay,t3-overlay,standard,≤ 200k,2,8077,0,13066,15,0,global,standard
+2026-10-31 15:00,claude-haiku-5-5,t3-overlay,t3-overlay,standard,≤ 200k,2,3821,0,1104,374,0,global,standard
+2026-10-31 16:00,claude-haiku-5-5,t3-overlay,t3-overlay,batch,≤ 200k,25,0,0,0,14,0,global,standard
+```
+
+| Hour, model, tier        | Column reading (uncached in / 5m write / 1h write / read / out) | Matches                                                                       | Arithmetic from the row          |
+| ------------------------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------- |
+| 14, Haiku 5.5, standard  | 2,384 / 8,900 / 0 / 13,066 / 59                                 | Request 1 (2 / 8,900 / 13,066 / 15) **plus an unexplained 2,382 in / 44 out** | about US$0.001511                |
+| 14, Sonnet 5.5, standard | 2 / 8,077 / 0 / 13,066 / 15                                     | Request 2 exactly                                                             | about US$0.021653                |
+| 15, Haiku 5.5, standard  | 2 / 3,821 / 0 / 1,104 / 374                                     | Request 3 exactly                                                             | about US$0.000676                |
+| 16, Haiku 5.5, **batch** | 25 / 0 / 0 / 0 / 14                                             | Request 4 exactly, billed at the batch tier                                   | about US$0.000005 at batch rates |
+
+Sum of the rows about US$0.02384; the first two rows (everything before the 14:09Z reading) about US$0.02316, against a displayed fall of 3 cents (US$99.98 to US$99.95) and no further displayed change at 15:07Z or 16:16Z (the later requests total under US$0.0007). The developer states nothing else used the key in the window.
+
+What this establishes:
+
+- All four requests are attributed one-to-one by hour, model and tier to the key and workspace `t3-overlay`: the Console recorded them as API usage, including the thread turns T3 launched through the Agent SDK path and the `claude -p` title path. Plan-billed Claude Code usage does not appear in the Console usage table.
+- The batch row carries the `batch` tier and its tokens, confirming it was processed as a batch under the same key and workspace.
+- Funding: the promotional-credit balance fell by an amount consistent with the rows (arithmetic 2.3 cents, displayed 3 cents, within display quantization), no purchased balance or payment method exists, and every request succeeded. The vendor says included credit is spent first and requests stop when it is gone. This is inference from consistency, not a per-request ledger entry; the Console exposes none at this granularity.
+
+What it leaves open:
+
+- **Unexplained residual:** hour 14's Haiku row holds 2,382 more uncached input tokens and 44 more output tokens (about US$0.00026 at standard rates) than request 1's transcript. No native transcript in `~/.claude_credit` explains them, and T3 recorded no other credit-instance run, title event or text-generation call in that hour. A plausible but unverified cause is an auxiliary Haiku call by the Claude Code runtime made by request 1's or request 2's process and not written to the session transcript; they cannot be separated, since both ran in hour 14. If so, T3's per-turn usage under-counts that runtime overhead for Claude, which the Phase 1 ledger should record as an unknown, not zero, per 03 rule 5.
+- The pages and the arithmetic do not establish the exact credit decrement per request.
+- Rates are the documented ones; the export does not show prices.
+
 ## Results
 
 Final readings after all four requests, 16:16Z: Billing & payments US$99.95, dashboard US$99.96, Max session 1 percent (investigating session; see above), weekly 0 percent. The balance fell 3 displayed cents over the run (US$99.98 to US$99.95 on Billing & payments), all between 14:07Z and 14:09Z after the Sonnet turn; requests 3 and 4 produced no visible change, as expected at their size.
 
-| Item                                          | Result                                                                                                                                                                                                                |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Free readings before any paid request         | Taken 2026-10-31 (developer-supplied); recorded above                                                                                                                                                                 |
-| Haiku 5.5 thread turn (14:06Z)                | Ran on the credit instance and config directory; 2 / 13,066 / 8,900 / 15 tokens; arithmetic about US$0.00125                                                                                                          |
-| Sonnet 5.5 thread turn (14:08Z)               | Ran on the credit instance and config directory; 2 / 13,066 / 8,077 / 15 tokens; arithmetic about US$0.02165                                                                                                          |
-| Title regeneration (15:05Z)                   | Ran through the text-generation path on the credit config directory; 2 / 1,104 / 3,821 / 374 tokens; arithmetic about US$0.00068                                                                                      |
-| Haiku Message Batches request (16:08Z)        | Succeeded in 95 seconds, `service_tier` `batch`, 25 in / 14 out; arithmetic US$0.00000475                                                                                                                             |
-| Batch discount versus same-model rate         | Verified in the rate table and the response tier (exactly half of US$0.0000095); not measurable as a charge                                                                                                           |
-| Funding source (promotional credit)           | **Supported, not established.** Balance fell with only the probes using the key, no purchased balance or payment method, and all four requests succeeded; per-request attribution awaits the Usage page's hourly rows |
-| Agent SDK versus Claude Code class            | Both T3 paths succeeded on the key with no other funding source; the vendor says credit does not cover Claude Code and refuses uncovered requests when only credit exists. This favours coverage but is inference     |
-| Max-window effect                             | **Not measurable**: confounded by the investigating Claude Code session (developer-attributed); not evidence either way                                                                                               |
-| Per-request attribution (Usage page, by hour) | **Pending**: the developer supplies the hourly rows for workspace `t3-overlay`, 14:00 to 17:00Z, split by model                                                                                                       |
+| Item                                   | Result                                                                                                                                                                                                                           |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Free readings before any paid request  | Taken 2026-10-31 (developer-supplied); recorded above                                                                                                                                                                            |
+| Haiku 5.5 thread turn (14:06Z)         | Credit instance and config directory; Console row matches its tokens (plus the unexplained residual); arithmetic about US$0.00125                                                                                                |
+| Sonnet 5.5 thread turn (14:08Z)        | Credit instance and config directory; Console row matches exactly; arithmetic about US$0.02165                                                                                                                                   |
+| Title regeneration (15:05Z)            | `claude -p` text generation on the credit config directory; Console row matches exactly; arithmetic about US$0.00068                                                                                                             |
+| Haiku Message Batches request (16:08Z) | Succeeded in 95 seconds; Console row has tier `batch`, 25 in / 14 out under the same workspace and key; arithmetic US$0.00000475                                                                                                 |
+| Batch discount versus same-model rate  | Documented rate exactly half the standard rate; response and Console show tier `batch`; no charge-level measurement is possible at this size                                                                                     |
+| Per-request attribution                | **Established** by hour, model, tier and tokens against the Console Usage rows, with one unexplained Haiku residual in hour 14 (2,382 in / 44 out, about US$0.00026)                                                             |
+| Funding source (promotional credit)    | **Supported by consistency**: balance fell 3 displayed cents against 2.3 cents of row arithmetic; no purchased balance or payment method; all requests succeeded; no per-request credit ledger exists                            |
+| Agent SDK versus Claude Code class     | Both T3 paths (SDK thread turns and `claude -p`) are recorded as API usage on the key and succeeded with credit as the only funding source; the vendor says Claude Code is not covered, so these were not treated as Claude Code |
+| Max-window effect                      | **Not measurable**: confounded by the investigating Claude Code session (developer-attributed); not evidence either way                                                                                                          |
 
-**In-T3 credit routing: `no-go: inconclusive`.** Under decision 30 the gate stays closed until per-request attribution is supplied. It would move toward `go` only if the Usage rows show Haiku tokens in hours 14 and 15 and 16 matching the three Haiku requests and Sonnet tokens in hour 14 matching request 2, with nothing else on the key; that is the developer's decision to take in the Phase 1 design round with this evidence, not an automatic promotion. If the rows cannot separate requests, the verdict stays inconclusive. No probe has been repeated or escalated. The batch result is separate: the request succeeded at the batch tier and rate; its funding source also awaits the Usage rows.
+## Verdict
+
+**In-T3 credit routing: `go`, scoped to what was exercised:** Haiku 5.5 and Sonnet 5.5 thread turns without tools, launched by T3 through the `Claude Credit` instance, and `claude -p` text generation (title regeneration) on that instance, at low effort. Evidence: per-request Console attribution to the `t3-overlay` workspace and key, a credit balance fall consistent with the row arithmetic, no other funding source, and success of all requests. Decision 30's inconclusive condition no longer applies to this scope.
+
+What `go` does not cover: tool-using or long-running turns, Fable, subagents, effort above low, other models, spend limits being hit, behaviour once the promotional balance reaches zero, or the Max plan's own window (not tested). It does not set a routing tier or budget; the Phase 1 design round decides those. `go` admits the in-T3 credit steps in Phases 1 to 3 (`07-roadmap.md`); the developer confirms that admission, since `decisions.md` records developer-accepted changes only (open question in the step-5 handoff).
+
+**Separate batch result:** one Haiku 5.5 Message Batches request through a temporary script with the same key succeeded at the batch tier, 95 seconds, and was recorded under the same workspace and key. The Phase 1 digest still needs its own scheduled-run evidence and its repository secret, which are developer actions outside this spike.
 
 ## Limits and coverage gaps
 
-- The developer's browser authorization could not be exercised (no browser tool); all billing-page readings are developer-supplied text.
-- Cent-rounded balances; the Usage page lags a few hours; the Cost page is two-decimal and daily.
+- The developer's browser authorization could not be exercised (no browser tool); all billing-page readings and the CSV are developer-supplied text, and the CSV had no header row.
+- Cent-rounded balances; the Usage page lags a few hours; the Cost page is two-decimal and daily; no per-request credit decrement is visible.
 - The Max window is confounded by the investigating session and unusable.
-- The coordinator's earlier 13:17Z project-creation turn ran on the subscription Claude instance before the coordinator was switched to Codex; it is outside the probe hours.
+- Unexplained residual of 2,382 uncached input and 44 output Haiku tokens in hour 14; cause unverified and not separable between requests 1 and 2.
+- The coordinator's earlier 13:17Z project-creation turn ran on the subscription Claude instance before it was switched to Codex; it is outside the probe hours and not on the key.
 - Vendor eligibility text for `claude -p` came from search summaries; only the credits page was read in full.
-- Tool-using turns, long contexts, Fable, subagents and non-Claude instances are out of scope. Process environment of the spawned credit-instance `claude` was not read; isolation rests on transcripts landing in `~/.claude_credit` and none in `~/.claude`.
+- Process environment of the spawned credit-instance `claude` was not read; isolation rests on transcripts landing in `~/.claude_credit`, none in `~/.claude`, and the Console recording the key's usage.
 - Token fixtures: the counts above are recorded here; no fixture file or test was changed.
 
 ## Reproduction (reads only)
