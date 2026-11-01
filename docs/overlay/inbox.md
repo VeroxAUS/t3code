@@ -2,7 +2,7 @@
 
 One line per change queued by an `_ask.md` thread. The next design round clears it.
 
-- 2026-11-01: Phase 1/2 design round: settle role enforcement given decision 32 (plan mode is prompt-level; Codex `readOnly` is OS-enforced; Claude `approval-required/plan` shell writes ran unprompted, hypothesis user `defaultMode: auto` and `useAutoModeDuringPlan`; Codex `workspaceWrite` is not a workspace boundary), and decide whether T3 should pin Claude's permission settings for role children (from: step 3 permission supplement).
+- 2026-11-01: Phase 1/2 design round: settle role enforcement given decision 32 (plan mode is prompt-level; Codex `readOnly` is OS-enforced; Claude `approval-required/plan` shell writes ran unprompted, hypothesis user `defaultMode: auto` and `useAutoModeDuringPlan`; a direct Codex `command/exec` under `workspaceWrite` depends on the app-server's start directory, so it proves neither a T3 escape nor a workspace boundary), and decide whether T3 should pin Claude's permission settings for role children (from: step 3 permission supplement).
 
 - 2026-10-31: Record support ticket #4927935's confirmation that the 03:17 UTC schedule is registered and native cron delivery may be delayed or dropped, retire the unregistered-schedule hypothesis, and adopt the developer-approved external scheduler route using overlay-sync.yml's existing workflow_dispatch trigger against overlay/main; the next design round selects the scheduler, credential setup and native-cron disposition, with an actual externally dispatched run as acceptance evidence (from: GitHub support response; external scheduler approved).
 

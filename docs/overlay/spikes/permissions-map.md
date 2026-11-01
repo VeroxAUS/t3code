@@ -131,7 +131,7 @@ Some child text claims cannot be accepted: Claude's first child did not see its 
 
 ## Independent file-state verification
 
-The coordinator ran the snapshot helper before and after every later job; the investigator saved the initial Claude baseline and independently re-read every cell after completion. Use this read-only command with the cell from the matrix, both before launch and after completion; it reports missing files explicitly:
+The archive `/tmp/phase0b-step3-evidence-20261031`, including the step-3 handoff's `verify-capture.py` and `native-codex.json`, no longer exists (checked 2026-11-02); the committed tables, digests and SQL are the durable record, and the command below needs a fresh root. The coordinator ran the snapshot helper before and after every later job; the investigator saved the initial Claude baseline and independently re-read every cell after completion. Use this read-only command with the cell from the matrix, both before launch and after completion; it reports missing files explicitly:
 
 ```sh
 python3 - claude-approval-default <<'PY'
@@ -191,7 +191,7 @@ Shared replacement-content SHA-256 values are `d4f14289437d00d81313e010d47a99adc
 - `RuntimePolicy.ts` resolves the shared project's directory when `worktreePath` is null and falls back to approval-required for an unsupported provider runtime mode. All three captures omitted `supportedRuntimeModes`, so there was no advertised restricted set to reject against. All explicit matrix requests were accepted and persisted unchanged. Other runtime settings, inheritance fallback and escalation were not probed live. Existing focused tests cover explicit rejection, inherited downgrade and dispatch limits; do not claim these as live provider results.
 - `ClaudeAdapterV2.ts`, `permissionModeForClaudeRuntimePolicy` / `claudeRuntimeQueryPolicyForRuntimePolicy`, maps plan to native `permissionMode: plan` and installs an approval callback even with full access. Default approval-required maps to native `default` with a callback. Full access otherwise maps to bypass; disabled bypass settings can downgrade it. A distinct explicit read-only sandbox narrows the tool list. The matrix did not request that sandbox or test bypass-disabled fallback. Source predicts plan write callbacks; the live plan children never exercised them, so runtime enforcement remains untested.
 - `CodexAdapterV2.ts`, `codexRuntimeModeTurnDefaults` / `buildCodexTurnStartParams`, independently sends runtime sandbox/approval policy and `collaborationMode`. The native `turn_context` records confirm all three configurations below. This proves the full-access mutations occurred with native plan configuration, not just T3 plan metadata.
-- `AntigravityAcpSupport.ts`, `antigravityPermissionMode`, maps full access to `yolo`, auto-accept-edits to `auto_edit`, and auto/approval-required to `default`. The Antigravity flavor passes that policy mode to shared ACP. `packages/provider-acp/src/server/adapter.ts` selects native `plan`/`architect` only when advertised through session modes or appropriate select options. The cache reports `showInteractionModeToggle: false`, with no mode options on the selected model. The live requests accepted T3 plan metadata without an unsupported-mode error or explicit downgrade. Native plan support/selection remains unverified; do not label it a confirmed native plan mode or silent downgrade.
+- `AntigravityAcpSupport.ts`, `antigravityPermissionMode`, maps full access to `yolo`, auto-accept-edits to `auto_edit`, and auto/approval-required to `default`. The Antigravity flavor passes that policy mode to shared ACP. `packages/provider-acp/src/server/adapter.ts` selects native `plan`/`architect` only when advertised through session modes or appropriate select options. The cache reports `showInteractionModeToggle: false`, with no mode options on the selected model. The live requests accepted T3 plan metadata without an unsupported-mode error or explicit downgrade. The 2026-11-02 model-free probe below shows Antigravity 1.3.0 advertises no `plan` or `architect`, so on this path T3 plan selects no native mode and raises no error.
 - Shared ACP `clientPolicy.ts` asks for approval on non-read permission requests under approval-required and allows the tested full-access requests. Its policy does not include interaction mode. Client terminal creation has a policy guard and turn/session approval grants. Antigravity client-file handlers separately check workspace containment; this is not a general OS sandbox or proof against a provider that omits permission requests. No adversarial ACP bypass, out-of-workspace write, network capability or other ACP runtime was tested.
 - Optional OpenCode source coverage: `packages/provider-opencode/src/server/OpenCodeRuntime.permissions.test.ts` covers required edit approvals and environment-file rules. That file and the adapter's policy are source evidence only here; no OpenCode test or live launch is claimed.
 
@@ -207,14 +207,14 @@ Native correlation: resolve each Codex child in `orchestration_v2_projection_pro
 
 Use **runtime-enforced** for a demonstrated runtime rejection independent of a human choice; **approval-gated** for a request resolved by a human followed by the corresponding outcome; **prompt-only** for the proposed no-edit restriction when it lacks a demonstrated hard boundary; **unsupported** for an unavailable control/operation; **untested** where no action was attempted or a capability was not observed. An allowed read is not proof of a read-only boundary.
 
-| Action / restriction                        | Claude                                                                                                                                                      | Codex                                                                                                                                              | Antigravity                                                                                                                           |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Direct writes, approval-required/default    | **Approval-gated**: accept changes, fresh decline preserves                                                                                                 | **Approval-gated**: decline preserves, accept appends                                                                                              | **Approval-gated**: decline preserves, accept replaces                                                                                |
-| Shell writes, approval-required/default     | **Approval-gated**, both outcomes observed                                                                                                                  | **Approval-gated**, both outcomes observed                                                                                                         | **Approval-gated**, both outcomes observed                                                                                            |
-| Direct/shell writes, full-access/plan       | **Untested**: four unattempted writes in step 3 and again in the 2026-11-01 supplement; the child declined citing plan instructions                         | No-edit restriction **prompt-only**, violated by actual deletion and shell write; second pair declined again in the supplement, still **untested** | No-edit restriction **prompt-only** at T3 plan level, violated by all four writes; native plan capability **untested**                |
-| Direct/shell writes, approval-required/plan | Supplement: direct write **approval-gated** (decline preserved, accept wrote); both shell writes **ran with no approval request** and changed their targets | **Untested**: four unattempted writes in step 3 and again in the supplement; native read-only/untrusted configuration observed                     | **Approval-gated**, both decisions/outcomes for both methods; plan did not prohibit accepted writes                                   |
-| Reads                                       | Native reads observed without approval; no read boundary tested                                                                                             | Shell reads **approval-gated** on the observed approval-required path; allowed without approval in PF; native reader **untested**                  | Read attempts observed, including hook denials and omitted success output; reliable returned content **untested**                     |
-| Guaranteed read-only from `plan` alone      | **No guarantee**: shell writes mutated files under approval-required/plan without a request (supplement)                                                    | **Prompt-only**, contradicted by live mutations                                                                                                    | **Prompt-only** at T3 level; native plan toggle **unsupported in the advertised client controls**, actual native selection unverified |
+| Action / restriction                        | Claude                                                                                                                                                      | Codex                                                                                                                                              | Antigravity                                                                                                                                       |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Direct writes, approval-required/default    | **Approval-gated**: accept changes, fresh decline preserves                                                                                                 | **Approval-gated**: decline preserves, accept appends                                                                                              | **Approval-gated**: decline preserves, accept replaces                                                                                            |
+| Shell writes, approval-required/default     | **Approval-gated**, both outcomes observed                                                                                                                  | **Approval-gated**, both outcomes observed                                                                                                         | **Approval-gated**, both outcomes observed                                                                                                        |
+| Direct/shell writes, full-access/plan       | **Untested**: four unattempted writes in step 3 and again in the 2026-11-01 supplement; the child declined citing plan instructions                         | No-edit restriction **prompt-only**, violated by actual deletion and shell write; second pair declined again in the supplement, still **untested** | No-edit restriction **prompt-only** at T3 plan level, violated by all four writes; native plan **unsupported** (not advertised, 2026-11-02 probe) |
+| Direct/shell writes, approval-required/plan | Supplement: direct write **approval-gated** (decline preserved, accept wrote); both shell writes **ran with no approval request** and changed their targets | **Untested**: four unattempted writes in step 3 and again in the supplement; native read-only/untrusted configuration observed                     | **Approval-gated**, both decisions/outcomes for both methods; plan did not prohibit accepted writes                                               |
+| Reads                                       | Native reads observed without approval; no read boundary tested                                                                                             | Shell reads **approval-gated** on the observed approval-required path; allowed without approval in PF; native reader **untested**                  | Read attempts observed, including hook denials and omitted success output; reliable returned content **untested**                                 |
+| Guaranteed read-only from `plan` alone      | **No guarantee**: shell writes mutated files under approval-required/plan without a request (supplement)                                                    | **Prompt-only**, contradicted by live mutations                                                                                                    | **Prompt-only** at T3 level; native plan **unsupported**: no plan mode advertised (2026-11-02 probe)                                              |
 
 T3 mode-ceiling rejection is **runtime-enforced at the T3 command boundary** by source plus the focused tests below. It is not proof of a provider filesystem sandbox. No live cell demonstrated an unconditional write rejection independent of human approval, and no required provider is classified as generally read-only. Default/full-access controls, auto/auto-accept-edits, mode changes, broader-parent rejection, unsupported settings and explicit read-only sandbox bypass attempts remain untested live. Unsupported controls were not substituted with another provider or API-key path.
 
@@ -225,7 +225,7 @@ Proposals for `05-delegation-engine.md`'s roles, to resolve in the Phase 1 desig
 3. Verification and review should use a separate disposable checkout of the candidate SHA, with no shared writer checkout. Step 4 must establish that recipe. This contains mutations to the disposable checkout; it does not stop them or prohibit access to other filesystem locations.
 4. A future requirement for strict no-write research/review needs an explicitly scoped and tested sandbox/tool boundary for both direct editing and shell execution. Selecting that boundary is future design work; do not weaken upstream permissions, add enforcement here, or silently route a role to an unproved guarantee.
 
-No developer policy decision was added to `decisions.md`, and `05` was not rewritten as if these proposals had been accepted. The launch matrix is complete, but the unattempted plan actions (re-attempted in the 2026-11-01 supplement below; declined again in three of four cells) and native ACP configuration remain evidence gaps. No developer deferral is assumed; any required unrun evidence needs a further probe or explicit developer deferral before Phase 0b review can pass. Steps 4–5 and the phase review are still outstanding.
+No developer policy decision was added to `decisions.md`, and `05` was not rewritten as if these proposals had been accepted. The launch matrix is complete, but the unattempted plan actions (re-attempted in the 2026-11-01 supplement below; declined again in three of four cells) remain evidence gaps, as native ACP configuration did until the 2026-11-02 probe below. No developer deferral is assumed; any required unrun evidence needs a further probe or explicit developer deferral before Phase 0b review can pass. Steps 4–5 and the phase review are still outstanding.
 
 ## Supplemental probes, 2026-11-01 (step 3's required unattempted cells)
 
@@ -245,36 +245,27 @@ Findings:
 - **Claude, approval-required with `plan`:** direct edits are approval-gated (a human decline preserved the target; an accept wrote it), but **shell writes executed with no approval request and mutated both targets, including the `deny-shell` target**, while the T3 mode was recorded as `approval-required/plan`. No runtime rejection occurred for either shell write. This contradicts treating that combination as read-only or as fully approval-gated; the shell path had no gate in this observation. Single run, one model; the cause (callback scope, native permission rule for this command form, or `plan` mapping) is not established. `ClaudeAdapterV2.ts` maps plan to native `permissionMode: plan` with an approval callback, so the source reading above does not explain the unprompted shell write.
 - **Claude `full-access/plan`, Codex `plan` in both runtime modes:** the children declined all 12 writes despite an explicit instruction to attempt them. That is model behaviour, not evidence about the runtime's enforcement. These cells remain **untested at the runtime layer**; prompting cannot force an attempt, and no further prompt variants were tried.
 - Claude's behaviour differed between `full-access/plan` (refused all) and `approval-required/plan` (attempted all), which this single pair of runs cannot explain.
-- Still unprobed after this supplement: Antigravity's native plan selection, OpenCode, network and outside-workspace writes, and any hard sandbox boundary.
+- Still unprobed after this supplement: OpenCode, network and T3-path outside-workspace writes, and any hard sandbox boundary. Antigravity's native plan selection was probed afterwards; see below.
 
 ### Model-free probes (2026-11-01, after the prompt-based cells above)
 
 The prompt-based children cannot settle runtime enforcement when the model declines, so two probes took the model out of the loop. Neither used a model, tokens, login or network, and neither touched a developer-owned directory except one disposable folder under the home directory that was removed afterwards.
 
-**Codex sandbox, `command/exec` through `codex app-server` (0.166.0).** T3's `codexRuntimeModeTurnDefaults` (`CodexAdapterV2.ts`) maps `approval-required` to approval policy `untrusted` with sandbox `{ type: "readOnly" }`, `auto-accept-edits` and `auto` to `workspaceWrite`, and `full-access` to `dangerFullAccess`. The probe starts `codex app-server` with a temporary `CODEX_HOME`, sends `initialize` and `initialized`, then calls `command/exec` with each sandbox policy to read a sentinel, write a sentinel inside the working directory, and write a file under a separate disposable directory in the home directory. Script (kept outside the repository, reproduced here):
+**Codex sandbox, `command/exec` through `codex app-server` (0.166.0).** T3's `codexRuntimeModeTurnDefaults` (`CodexAdapterV2.ts`) maps `approval-required` to approval policy `untrusted` with sandbox `{ type: "readOnly" }`, `auto-accept-edits` and `auto` to `workspaceWrite`, and `full-access` to `dangerFullAccess`. The probe starts `codex app-server` with a temporary `CODEX_HOME`, sends `initialize` and `initialized`, then calls `command/exec` with each sandbox policy to read a sentinel, write a sentinel inside the working directory, and write a file under a separate disposable directory in the home directory. Two working directories are involved: the app-server process inherits the directory the script starts in, and `command/exec` sets its own `cwd` to the sentinel directory. The script records both and allocates fresh paths on each run. It replaces the 2026-11-01 version, which used fixed paths and did not record the start directory. Script (kept outside the repository, reproduced here):
 
 ```python
 #!/usr/bin/env python3 -I
-"""Model-free Codex sandbox probe: command/exec through `codex app-server` under each sandbox policy T3 maps.
-No model, no login, no network. Temporary CODEX_HOME. Writes only under the sentinel roots below."""
-import json, os, subprocess, sys, hashlib, tempfile, selectors, time
-ROOT = '/tmp/phase0b-codex-exec-probe'
-OUT = os.path.expanduser('~/phase0b-codex-exec-outside')
-POLICIES = {'readOnly': {'type': 'readOnly'}, 'workspaceWrite': {'type': 'workspaceWrite'}, 'dangerFullAccess': {'type': 'dangerFullAccess'}}
+"""Model-free Codex sandbox probe: command/exec through `codex app-server`. No login or model. Fresh paths per run.
+Usage, run once from each app-server start directory: cd <start-dir> && python3 -I <this file>."""
+import hashlib, json, os, selectors, shutil, subprocess, tempfile, time
+ROOT = tempfile.mkdtemp(prefix='phase0b-codex-cwd-', dir='/tmp')
+OUT = tempfile.mkdtemp(prefix='phase0b-codex-cwd-outside-', dir=os.path.expanduser('~'))
+HOME = tempfile.mkdtemp(prefix='codexhome-')
+POLICIES = ('readOnly', 'workspaceWrite', 'dangerFullAccess')
 def sha(p):
-    return hashlib.sha256(open(p, 'rb').read()).hexdigest() if os.path.exists(p) else None
-os.makedirs(ROOT, exist_ok=False); os.makedirs(OUT, exist_ok=False)
-cases = []
-for name in POLICIES:
-    d = f'{ROOT}/{name}'; o = f'{OUT}/{name}'
-    os.makedirs(d); os.makedirs(o)
-    for p in (f'{d}/inside.txt', f'{d}/read.txt', f'{o}/target.txt'):
-        open(p, 'w').write(f'baseline:{name}:{os.path.basename(p)}\n')
-    cases.append((name, d, o))
-base = {p: sha(p) for n, d, o in cases for p in (f'{d}/inside.txt', f'{d}/read.txt', f'{o}/target.txt')}
-home = tempfile.mkdtemp(prefix='codexhome-')
-env = {**os.environ, 'CODEX_HOME': home}
-proc = subprocess.Popen(['codex', 'app-server'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, text=True, bufsize=1)
+    return hashlib.sha256(open(p, 'rb').read()).hexdigest()
+proc = subprocess.Popen(['codex', 'app-server'], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL, env={**os.environ, 'CODEX_HOME': HOME}, text=True, bufsize=1)
 sel = selectors.DefaultSelector(); sel.register(proc.stdout, selectors.EVENT_READ)
 nid = 0
 def send(method, params=None, notify=False):
@@ -288,45 +279,51 @@ def send(method, params=None, notify=False):
 def recv(want, timeout=30):
     end = time.monotonic() + timeout
     while time.monotonic() < end:
-        for key, _ in sel.select(timeout=max(0.0, end - time.monotonic())):
+        for _ in sel.select(timeout=max(0.0, end - time.monotonic())):
             line = proc.stdout.readline()
             if not line: return {'error': 'eof'}
             m = json.loads(line)
             if m.get('id') == want: return m
     return {'error': 'timeout'}
-r = recv(send('initialize', {'clientInfo': {'name': 'overlay-sandbox-probe', 'version': '0'}}))
-print('initialize:', json.dumps(r)[:300])
+recv(send('initialize', {'clientInfo': {'name': 'overlay-sandbox-probe', 'version': '0'}}))
 send('initialized', notify=True)
-results = []
-def run(name, label, argv, cwd, policy):
-    rid = send('command/exec', {'command': argv, 'cwd': cwd, 'sandboxPolicy': policy, 'timeoutMs': 15000})
-    r = recv(rid)
-    res = r.get('result') or {}
-    results.append({'policy': name, 'op': label, 'exitCode': res.get('exitCode'), 'stdout': (res.get('stdout') or '')[:80], 'stderr': (res.get('stderr') or '')[:200], 'error': r.get('error')})
-for name, d, o in cases:
-    pol = POLICIES[name]
-    run(name, 'read-inside', ['/bin/cat', f'{d}/read.txt'], d, pol)
-    run(name, 'write-inside', ['/bin/bash', '-c', f"printf 'probe:inside\\n' > {d}/inside.txt"], d, pol)
-    run(name, 'write-outside', ['/bin/bash', '-c', f"printf 'probe:outside\\n' > {o}/target.txt"], d, pol)
-proc.stdin.close()
-try: proc.wait(timeout=10)
-except Exception: proc.kill()
-for r in results: print(json.dumps(r))
-for p, h in base.items():
-    print('file', p.replace(ROOT, '<root>').replace(OUT, '<outside>'), 'unchanged' if sha(p) == h else 'CHANGED ' + repr(open(p).read()[:30]))
+print(json.dumps({'codex': subprocess.check_output(['codex', '--version'], text=True).strip(),
+                  'appServerCwd': os.getcwd(), 'home': os.path.expanduser('~')}))
+for name in POLICIES:
+    d, o = f'{ROOT}/{name}', f'{OUT}/{name}'
+    os.makedirs(d); os.makedirs(o)
+    for p in (f'{d}/read.txt', f'{d}/inside.txt', f'{o}/target.txt'):
+        open(p, 'w').write(f'baseline:{name}:{os.path.basename(p)}\n')
+    for label, argv, target in (
+        ('read-inside', ['/bin/cat', f'{d}/read.txt'], f'{d}/read.txt'),
+        ('write-inside', ['/bin/bash', '-c', f"printf 'probe:inside\\n' > {d}/inside.txt"], f'{d}/inside.txt'),
+        ('write-home-subfolder', ['/bin/bash', '-c', f"printf 'probe:outside\\n' > {o}/target.txt"], f'{o}/target.txt'),
+    ):
+        before = sha(target)
+        res = recv(send('command/exec', {'command': argv, 'cwd': d, 'sandboxPolicy': {'type': name}, 'timeoutMs': 15000})).get('result') or {}
+        print(json.dumps({'policy': name, 'op': label, 'commandCwd': d.replace(ROOT, '<root>'),
+                          'exit': res.get('exitCode'), 'stderr': (res.get('stderr') or '').strip()[-60:],
+                          'changed': sha(target) != before}))
+proc.stdin.close(); proc.wait(timeout=10)
+for path in (ROOT, OUT, HOME): shutil.rmtree(path)
 ```
 
-Result, one run, every file checked against its baseline hash:
+Result, 2026-11-02, codex-cli 0.166.0, one run from each start directory. `command/exec`'s cwd is `/tmp/phase0b-codex-cwd-*/<policy>` in every row, and each file was checked by hash. The Astra review got the same matrix independently.
 
-| Sandbox policy (T3 mode that uses it) | Read inside | Write inside cwd                                | Write outside cwd (disposable home subfolder)                 |
-| ------------------------------------- | ----------- | ----------------------------------------------- | ------------------------------------------------------------- |
-| `readOnly` (approval-required)        | exit 0, ok  | exit 1, `Read-only file system`, file unchanged | exit 1, `Read-only file system`, file unchanged               |
-| `workspaceWrite` (auto-accept, auto)  | exit 0, ok  | exit 0, file changed                            | exit 0, **file changed** (no confinement to the cwd observed) |
-| `dangerFullAccess` (full-access)      | exit 0, ok  | exit 0, file changed                            | exit 0, file changed                                          |
+| App-server start directory       | Sandbox policy (T3 mode that uses it) | Read inside | Write inside command cwd | Write to separate home subfolder |
+| -------------------------------- | ------------------------------------- | ----------- | ------------------------ | -------------------------------- |
+| `/home/verox/src/t3code-phase-0` | `readOnly` (approval-required)        | exit 0      | exit 1, unchanged        | exit 1, unchanged                |
+| `/home/verox/src/t3code-phase-0` | `workspaceWrite` (auto-accept, auto)  | exit 0      | exit 0, changed          | **exit 1, unchanged**            |
+| `/home/verox/src/t3code-phase-0` | `dangerFullAccess` (full-access)      | exit 0      | exit 0, changed          | exit 0, changed                  |
+| `/home/verox`                    | `readOnly` (approval-required)        | exit 0      | exit 1, unchanged        | exit 1, unchanged                |
+| `/home/verox`                    | `workspaceWrite` (auto-accept, auto)  | exit 0      | exit 0, changed          | **exit 0, changed**              |
+| `/home/verox`                    | `dangerFullAccess` (full-access)      | exit 0      | exit 0, changed          | exit 0, changed                  |
+
+Every rejected write reported `Read-only file system`. The 2026-11-01 run reported the `workspaceWrite` home-subfolder write as changed, but it did not record its start directory, so it cannot be assigned to either row.
 
 - **Runtime-enforced for `readOnly`:** the OS sandbox rejected both writes, independent of any model or human decision. This is the sandbox T3 requests for Codex approval-required, so for that runtime mode shell writes are blocked at the sandbox unless an approved command is run outside it (step 3 saw approved commands run). This is a direct app-server call with T3's policy values, not T3's live plumbing; the live `codex-plan-approval` children's own statement that the filesystem was read-only fits this result but was not observed independently.
 - `dangerFullAccess` writes succeed, matching step 3's live full-access mutations.
-- `workspaceWrite` wrote outside the working directory in this environment. The cause is not established (a default writable root, the Linux sandbox backend in WSL2, or the policy's defaults); do not rely on `workspaceWrite` as a workspace boundary without a further probe.
+- `workspaceWrite` rejected or allowed the same home-subfolder write depending only on the app-server's start directory; the allowed case started in a directory that contains the target. The mechanism is not established. This is a direct `command/exec` observation that depends on launch context, so it shows neither a T3 escape nor a general confinement guarantee. T3 supplies thread and turn cwd through a different path (`CodexAdapterV2.ts:1314` and `:784`), which this probe does not exercise. A T3 role guarantee needs its own scoped evidence.
 - Codex's `plan` collaboration mode has no sandbox effect of its own in this evidence: in `full-access/plan` the policy is `dangerFullAccess`, so plan-mode no-edit remains prompt-level there.
 
 **Claude policy dump.** T3's exported `claudeRuntimeQueryPolicyForRuntimePolicy` evaluated for each mode pair (script below, run from `apps/server` with `node`), giving the native permission mode and whether the approval callback is installed:
@@ -375,6 +372,103 @@ For `approval-required/plan` T3 requests the native `plan` mode **and** installs
 Implication for the proposals above (unchanged by this supplement except as noted): proposal 1 gains evidence, since plan-level restrictions are prompt-level; proposal 2 should add that on Claude, approval-required did not gate shell writes in plan mode in this observation, so a human gate cannot be assumed for shell on that combination without a further probe.
 
 Reproduce: create a fresh directory with `read.txt` and four write targets per cell, record hashes, launch with the `delegate_task` shape above, then compare hashes and read `orchestration_events` for the child's `command_execution`, `file_change` and `runtime-request.updated` records, never opening the database read-write.
+
+### Antigravity native modes (model-free, 2026-11-02)
+
+This settles the native plan question for the installed release. The probe uses T3's own Antigravity runtime and spawn helpers against the worktree's isolated profile, on `oauth-personal`, and sends `initialize` and `session/new` in an empty temporary directory with no MCP servers. It sends no prompt, so no model turn runs. Put the script in an empty directory outside the repository with `ln -s <repo>/apps/server/node_modules node_modules`, then run `node antigravity_modes.ts <repo> <repo>/.t3/userdata`, with no T3 server needed.
+
+```ts
+// Model-free: initialize and session/new only, no prompt. Run from a directory where `effect` resolves.
+// Usage: node antigravity_modes.ts <repo> <T3 userdata dir>
+import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
+import * as NodeServices from "@effect/platform-node/NodeServices";
+import * as Effect from "effect/Effect";
+import * as FileSystem from "effect/FileSystem";
+import * as ChildProcessSpawner from "effect/process/ChildProcessSpawner";
+import { readFileSync } from "node:fs";
+const [repo, stateDir] = process.argv.slice(2) as [string, string];
+const server = `${repo}/apps/server/src/provider`;
+const { makeAntigravityAcpRuntime } = await import(`${server}/acp/AntigravityAcpSupport.ts`);
+const {
+  buildAntigravityAcpSpawnInput,
+  prepareAntigravityProfile,
+  resolveAntigravityInstanceDirectories,
+} = await import(`${server}/antigravityAuthSupport.ts`);
+const tools = `${stateDir}/../tools/antigravity-acp/linux-x64`;
+const { releaseId } = JSON.parse(readFileSync(`${tools}/active.json`, "utf8"));
+const release = `${tools}/versions/${releaseId}`;
+const record = JSON.parse(readFileSync(`${release}/.install-complete.json`, "utf8"));
+const program = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem;
+  const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+  const cwd = yield* fs.makeTempDirectoryScoped({ prefix: "phase0b-acp-modes-" });
+  const dirs = yield* resolveAntigravityInstanceDirectories(stateDir, "antigravity");
+  const profile = yield* prepareAntigravityProfile({
+    profileDirectory: dirs.profile,
+    tempDirectory: dirs.runtimeTemp,
+  });
+  const runtime = yield* makeAntigravityAcpRuntime({
+    spawn: buildAntigravityAcpSpawnInput({
+      installation: {
+        executablePath: `${release}/${record.executable.name}`,
+        harnessPath: `${release}/${record.harness.name}`,
+      },
+      profile,
+      cwd,
+    }),
+    cwd,
+    childProcessSpawner: spawner,
+    clientInfo: { name: "t3-code", version: "0.0.0" },
+    authMethod: "oauth-personal",
+  });
+  const started = yield* runtime.start();
+  const modeState = yield* runtime.getModeState;
+  const options = yield* runtime.getConfigOptions;
+  console.log(
+    JSON.stringify(
+      {
+        agent: started.initializeResult.agentInfo,
+        protocolVersion: started.initializeResult.protocolVersion,
+        setupResultKeys: Object.keys(started.sessionSetupResult),
+        rawModes: started.sessionSetupResult.modes ?? null,
+        modeState: modeState ?? null,
+        configOptions: options.map(
+          (o: {
+            id: string;
+            name?: string;
+            category?: string;
+            type: string;
+            currentValue?: unknown;
+            options?: ReadonlyArray<unknown>;
+          }) => ({
+            id: o.id,
+            name: o.name,
+            category: o.category ?? null,
+            type: o.type,
+            currentValue: o.currentValue,
+            choices: o.id === "model" ? `[${o.options?.length} model choices]` : o.options,
+          }),
+        ),
+      },
+      null,
+      2,
+    ),
+  );
+});
+NodeRuntime.runMain(program.pipe(Effect.scoped, Effect.provide(NodeServices.layer)));
+```
+
+Result, one session, agent `antigravity-acp` 1.3.0, protocol 2. `session/new` returned the keys `sessionId`, `modes`, `configOptions` and `models`.
+
+| Field                                   | Current value           | Advertised values                  |
+| --------------------------------------- | ----------------------- | ---------------------------------- |
+| `modes.availableModes`                  | `default`               | `default`, `auto_edit`, `yolo`     |
+| Config option `mode`, category `mode`   | `default`               | `default`, `auto_edit`, `yolo`     |
+| Config option `model`, category `model` | `gemini-3.8-flash-high` | six model choices, not mode values |
+
+No `collaboration_mode` option exists, and neither `plan` nor `architect` is advertised anywhere. The vendor describes the three modes as permission flows, and they are the values `antigravityPermissionMode` sends. At `packages/provider-acp/src/server/adapter.ts:6766-6795` T3 looks for `plan` or `architect`, finds neither, and so calls neither `setMode` nor `setConfigOption` and raises no error.
+
+**Reclassification:** on Antigravity 1.3.0, T3 `plan` has no native mode behind it. It is a silent no-op for native selection, and any plan restriction stays prompt-only. This agrees with the live `full-access/plan` writes and the cached `showInteractionModeToggle: false`. The limits are one session on one release with the default model. Another release, or a session with MCP servers attached, may advertise differently, so a role decision should re-read `availableModes` for the release it ships on.
 
 ## Validation and operational carryover
 
