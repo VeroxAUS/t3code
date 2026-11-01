@@ -23,6 +23,7 @@ Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` ·
 - Acceptance tests: `cd packages/routing && ../../node_modules/.bin/vp test run src/costs.test.ts` → 22 passed; `cd apps/server && ../../node_modules/.bin/vp test run src/routing/ReplayDurability.spike.test.ts` → 5 passed. No fixture file changed.
 - Root check: `vp run check:changed origin/overlay/main` → pass for the docs-only change (format passes; code and dependency checks skip).
 - Server: the isolated dev server was started by this thread from the worktree and stopped with `kill -- -13021` after confirming both port owners had this worktree's cwd and group; the live Windows listener on 3774 was not touched.
+- Step 3 supplement (developer-requested, 2026-11-01): four plan-mode children re-run on the isolated server and Codex-Sol coordinator, checked against file hashes and `orchestration_events` → Claude `approval-required/plan`: direct edit approval-gated (decline preserved, accept wrote) but **both shell writes ran with no approval request and changed their targets**; Claude `full-access/plan`, Codex `plan` in both runtime modes: children declined all 12 writes (model behaviour; runtime layer still untested). Details in `permissions-map.md`. Server stopped with `kill -- -6264`.
 - Sync inspection (read only): `gh run list --repo VeroxAUS/t3code --workflow overlay-sync.yml --json databaseId,event,conclusion,createdAt,url` → still only manual [run 40822950375](https://github.com/VeroxAUS/t3code/actions/runs/40822950375). Ticket #4927935 is answered (schedule registered; native delivery may be delayed or dropped); the external-scheduler route is developer-approved. Scheduler selection, credential setup and native-cron disposition remain for the next design round. No setting, secret or dispatch was touched.
 
 ## Not done / deferred
@@ -30,7 +31,7 @@ Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` ·
 - The 2,382 in / 44 out Haiku residual in hour 14: cause unverified (plausibly runtime-internal auxiliary calls not in the transcript), not separable between requests 1 and 2.
 - Exact per-request credit decrement: no source exists at this granularity; funding is inferred from consistency.
 - Process environment of the spawned credit-instance `claude` was not read; isolation rests on transcript locations.
-- Inherited and unresolved, not deferred by the developer: step 3's required unattempted permission probes (Claude plan write enforcement eight, Codex approval-required/plan four, Codex full-access/plan two); native Antigravity plan-mode selection; positive setup-script execution; step 1's live cumulative/reset/steering/interrupted/reasoning/subagent behavior, OpenCode 2 and other ACP live coverage; step 2's concurrent rebuild, process-kill continuation and power-loss durability; step 4's read-only enforcement, provider-turn cwd, remote-only candidate, submodule, relay/client and hostile-setup coverage.
+- Inherited and unresolved, not deferred by the developer: step 3's plan-mode write cells are now **attempted but not resolved** (three of four re-declined by the models; Claude approval-required/plan shell writes bypassed approval); native Antigravity plan-mode selection; positive setup-script execution; step 1's live cumulative/reset/steering/interrupted/reasoning/subagent behavior, OpenCode 2 and other ACP live coverage; step 2's concurrent rebuild, process-kill continuation and power-loss durability; step 4's read-only enforcement, provider-turn cwd, remote-only candidate, submodule, relay/client and hostile-setup coverage.
 
 ## Decisions made and why
 
@@ -49,7 +50,7 @@ Branch `overlay/phase-0b-step-5` · worktree `/home/verox/src/t3code-phase-0` ·
 ## Developer actions
 
 - Re-enable `Claude Credit` text generation in the live install if you want it; it uses the same key and was disabled only for the probes.
-- Resolve step 3's permission coverage with probes or an explicit written deferral before the Phase 0b review.
+- Step 3: review the supplement in `permissions-map.md`. Either accept the remaining declined cells as untested (a written deferral) or ask for a different probe design, such as a tool-level test without the model in the loop; and decide what to do about the Claude approval-required/plan shell-write finding (a later probe with other command forms, or a Phase 1 design note).
 - Sync: repeat the `gh run list` command above at the next daily slot and record any real scheduled run. Scheduler selection and any dispatch remain yours.
 - Review/merge the step-5 PR when satisfied; the agent never merges.
 
